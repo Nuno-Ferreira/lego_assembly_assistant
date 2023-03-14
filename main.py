@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
-import os
+#import os
+
+images_folder = r'/home/nuno/Documents/lego_assembly_assistant/lego_images'
 
 vc = cv2.VideoCapture(1)
 kernel = np.ones((5, 5), np.uint8)
