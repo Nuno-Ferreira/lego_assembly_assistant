@@ -2,14 +2,16 @@ import cv2
 import numpy as np
 #import os
 
+# IMAGE FOLDER AND IMAGE NAME
 images_folder = r'/home/nuno/Documents/lego_assembly_assistant/lego_images/'
 lego_image = 'all'
 
-
+# SETTING UP THE KERNEL AND IMAGE
 kernel = np.ones((5, 5), np.uint8)
+img = cv2.imread(images_folder + lego_image + '.jpeg')
 
 # GREEN COLOR RANGES
-lower_green = np.array([40,0,0])
+lower_green = np.array([50,50,50])
 upper_green = np.array([80,255,255])
 
 # YELLOW COLOR RANGES
@@ -24,24 +26,12 @@ upper_red = np.array([10,255,255])
 lower_blue = np.array([90,100,100])
 upper_blue = np.array([160,255,255])
 
-
-# IMAGE PROCESSING
-img = cv2.imread(images_folder + lego_image + '.jpeg')
-img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-img_blur = cv2.blur(img_gray, (3, 3))
-img_erode = cv2.erode(img_blur, kernel, iterations=1)
-img_dilate = cv2.dilate(img_erode, kernel, iterations=1)
-thr_value, img_thresh = cv2.threshold(img_blur, 100, 200, cv2.THRESH_BINARY)  # add this: cv2.THRESH_OTSU
-img_close = cv2.morphologyEx(img_thresh, cv2.MORPH_OPEN, kernel)
-contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-
-
 # GREEN COLOR DETECTION
 imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_green = cv2.inRange(imghsv, lower_green, upper_green)
 img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
-# green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
-# green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
+green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
 # contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 # output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
 
@@ -56,11 +46,20 @@ red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
 # BLUE COLOR DETECTION
 mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
 img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
-# blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
-# blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
+blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
+blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
 # contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 # output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
 
+# IMAGE PROCESSING
+img = cv2.imread(images_folder + lego_image + '.jpeg')
+img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+img_blur = cv2.blur(img_gray, (3, 3))
+img_erode = cv2.erode(img_blur, kernel, iterations=1)
+img_dilate = cv2.dilate(img_erode, kernel, iterations=1)
+thr_value, img_thresh = cv2.threshold(img_blur, 100, 200, cv2.THRESH_BINARY)  # add this: cv2.THRESH_OTSU
+img_close = cv2.morphologyEx(img_thresh, cv2.MORPH_OPEN, kernel)
+contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
 # DISPLAYING CONTOURS
 # for i, c in enumerate(contours):
@@ -75,9 +74,9 @@ cv2.imshow('picture',img)
 # #cv2.imshow('close', img_close)
 # cv2.imshow('erode', img_erode)
 # cv2.imshow('dilate', img_dilate)
-cv2.imshow('green mask', img_green_mask)
+cv2.imshow('green mask', green_mask)
 cv2.imshow('red mask', red_mask)
-cv2.imshow('blue mask', img_blue_mask)
+cv2.imshow('blue mask', blue_mask)
 # cv2.imshow('red mask', mask)
 # cv2.imshow('blue mask', mask)
 
