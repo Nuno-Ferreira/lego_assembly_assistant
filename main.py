@@ -36,6 +36,28 @@ contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPR
 imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_green = cv2.inRange(imghsv, lower_green, upper_green)
 img_mask = cv2.bitwise_and(img, img, mask=mask_green)
+mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
+mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+
+# RED COLOR DETECTION
+imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+mask_red = cv2.inRange(imghsv, lower_red, upper_red)
+img_mask = cv2.bitwise_and(img, img, mask=mask_red)
+mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
+mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+
+# BLUE COLOR DETECTION
+imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
+img_mask = cv2.bitwise_and(img, img, mask=mask_blue)
+mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
+mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
 
 
 # DISPLAYING CONTOURS
@@ -51,7 +73,10 @@ cv2.imshow('picture',img)
 # #cv2.imshow('close', img_close)
 # cv2.imshow('erode', img_erode)
 # cv2.imshow('dilate', img_dilate)
-cv2.imshow('green mask', img_mask)
+cv2.imshow('green mask', mask)
+# cv2.imshow('red mask', mask)
+# cv2.imshow('blue mask', mask)
+
 key = cv2.waitKey(0)
 cv2.destroyAllWindows()
 
