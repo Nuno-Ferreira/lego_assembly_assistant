@@ -3,22 +3,26 @@ import numpy as np
 #import os
 
 images_folder = r'/home/nuno/Documents/lego_assembly_assistant/lego_images/'
-lego_image = 'g'
+lego_image = 'all'
 
 
 kernel = np.ones((5, 5), np.uint8)
 
 # GREEN COLOR RANGES
-lower_green = np.array([60,100,100])
-upper_green = np.array([85,255,255])
+lower_green = np.array([40,0,0])
+upper_green = np.array([80,255,255])
+
+# YELLOW COLOR RANGES
+lower_yellow = np.array([20,100,100])
+upper_yellow = np.array([50,255,255])
 
 # RED COLOR RANGES
-lower_red = np.array([0,0,100])
-upper_red = np.array([0,0,255])
+lower_red = np.array([0,0,0])
+upper_red = np.array([10,255,255])
 
 # BLUE COLOR RANGES
-lower_blue = np.array([100,0,0])
-upper_blue = np.array([255,0,0])
+lower_blue = np.array([90,100,100])
+upper_blue = np.array([160,255,255])
 
 
 # IMAGE PROCESSING
@@ -35,29 +39,27 @@ contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPR
 # GREEN COLOR DETECTION
 imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_green = cv2.inRange(imghsv, lower_green, upper_green)
-img_mask = cv2.bitwise_and(img, img, mask=mask_green)
-mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
-mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
+# green_mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
+# green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+# contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+# output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
 
 # RED COLOR DETECTION
-imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_red = cv2.inRange(imghsv, lower_red, upper_red)
-img_mask = cv2.bitwise_and(img, img, mask=mask_red)
-mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
-mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+img_red_mask = cv2.bitwise_and(img, img, mask=mask_red)
+# red_mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
+# red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+# contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+# output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
 
 # BLUE COLOR DETECTION
-imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
-img_mask = cv2.bitwise_and(img, img, mask=mask_blue)
-mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
-mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
+# blue_mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
+# blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
+# contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+# output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
 
 
 # DISPLAYING CONTOURS
@@ -73,7 +75,9 @@ cv2.imshow('picture',img)
 # #cv2.imshow('close', img_close)
 # cv2.imshow('erode', img_erode)
 # cv2.imshow('dilate', img_dilate)
-cv2.imshow('green mask', mask)
+cv2.imshow('green mask', img_green_mask)
+cv2.imshow('red mask', img_red_mask)
+cv2.imshow('blue mask', img_blue_mask)
 # cv2.imshow('red mask', mask)
 # cv2.imshow('blue mask', mask)
 
