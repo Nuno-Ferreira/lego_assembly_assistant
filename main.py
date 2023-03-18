@@ -3,7 +3,9 @@ import numpy as np
 #import os
 
 # IMAGE FOLDER AND IMAGE NAME
-images_folder = r'/home/nuno/Documents/lego_assembly_assistant/lego_images/'
+# NEED TO CHANGE THE PATH TO THE FOLDER WHERE THE IMAGES ARE TO BE ABLE TO WORK ON ALL OS
+#images_folder = r'/home/nuno/Documents/lego_assembly_assistant/lego_images/' # USED FOR LINUX
+images_folder = r'D:/GitHub/lego_assembly_assistant/lego_images/' # USED FOR WINDOWS
 lego_image = 'all'
 
 # SETTING UP THE KERNEL AND IMAGE
@@ -20,8 +22,7 @@ upper_yellow = np.array([50,255,255])
 
 # RED COLOR RANGES
 lower_red = np.array([0,0,0])
-upper_red = np.array([10,255,255])
-
+upper_red = np.array([15,255,255]) # don't change this value / need to find another way to detect red
 # BLUE COLOR RANGES
 lower_blue = np.array([90,100,100])
 upper_blue = np.array([160,255,255])
@@ -74,9 +75,9 @@ cv2.imshow('picture',img)
 # #cv2.imshow('close', img_close)
 # cv2.imshow('erode', img_erode)
 # cv2.imshow('dilate', img_dilate)
-cv2.imshow('green mask', green_mask)
+# cv2.imshow('green mask', green_mask)
 cv2.imshow('red mask', red_mask)
-cv2.imshow('blue mask', blue_mask)
+# cv2.imshow('blue mask', blue_mask)
 # cv2.imshow('red mask', mask)
 # cv2.imshow('blue mask', mask)
 
