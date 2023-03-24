@@ -21,7 +21,7 @@ lower_yellow = np.array([20,100,100])
 upper_yellow = np.array([50,255,255])
 
 # RED COLOR RANGES
-lower_red1 = np.array([0,50,50])
+lower_red1 = np.array([0,50,50]) # NEED TO ADD THE SECOND MASK TO DETECT RED DUE TO HOW HSV WORKS
 upper_red1 = np.array([5,255,255])
 lower_red2 = np.array([170,50,50]) 
 upper_red2 = np.array([180,255,255])
@@ -36,26 +36,38 @@ mask_green = cv2.inRange(imghsv, lower_green, upper_green)
 img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
 green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
 green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
-# contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-# output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+
+# FOR DETECTING AND DRAWING THE CONTOURS OF THE GREEN MASK
+img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
+thr_value, img_thresh = cv2.threshold(img_green, 100, 200, cv2.THRESH_BINARY)
+contours, hierarchy = cv2.findContours(img_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+green_output = cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
 
 # RED COLOR DETECTION
 mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
 mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
-combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS DUE TO HOW HSV WORKS
+combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
 img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
 red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
 red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
-# contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-# output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+
+# FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
+img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
+thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
+contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
 
 # BLUE COLOR DETECTION
 mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
 img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
 blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
 blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
-# contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-# output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+
+# FOR DETECTING AND DRAWING THE CONTOURS OF THE BLUE MASK
+img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
+thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
+contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
 
 # IMAGE PROCESSING
 img = cv2.imread(images_folder + lego_image + '.jpeg')
@@ -73,19 +85,10 @@ contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPR
 
 
 # DISPLAYING IMAGES
-cv2.imshow('picture',img)
-#cv2.imshow('gray', img_gray)
-#cv2.imshow('thresh', img_thresh)
-# #cv2.imshow('blur', img_blur)
-# #cv2.imshow('close', img_close)
-# cv2.imshow('erode', img_erode)
-# cv2.imshow('dilate', img_dilate)
-# cv2.imshow('green mask', green_mask)
-cv2.imshow('red mask', red_mask)
-# cv2.imshow('blue mask', blue_mask)
-# cv2.imshow('red mask', mask)
-# cv2.imshow('blue mask', mask)
+# cv2.imshow('picture', img)
+cv2.imshow('red mask', red_output)
+# cv2.imshow('blue mask', blue_output)
+# cv2.imshow('green mask', green_output)
 
 key = cv2.waitKey(0)
 cv2.destroyAllWindows()
-
