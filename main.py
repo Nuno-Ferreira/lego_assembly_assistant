@@ -3,9 +3,7 @@ import numpy as np
 #import os
 
 # IMAGE FOLDER AND IMAGE NAME
-# NEED TO CHANGE THE PATH TO THE FOLDER WHERE THE IMAGES ARE TO BE ABLE TO WORK ON ALL OS
-#images_folder = r'/home/nuno/Documents/lego_assembly_assistant/lego_images/' # USED FOR LINUX
-images_folder = r'./lego_images/' # USED FOR WINDOWS
+images_folder = r'./lego_images/' # USED FOR ALL OS
 lego_image = 'all'
 
 # SETTING UP THE KERNEL AND IMAGE
