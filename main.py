@@ -43,6 +43,11 @@ img_yellow = cv2.cvtColor(yellow_mask, cv2.COLOR_BGR2GRAY)
 thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
 contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
+for i, c in enumerate(contours):
+    M = cv2.moments(c)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+    cv2.putText(yellow_output, 'YELLOW', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 
 #------------------------------------------------- GREEN COLOR DETECTION -----------------------------------------------#
@@ -56,6 +61,11 @@ img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
 thr_value, img_thresh = cv2.threshold(img_green, 100, 200, cv2.THRESH_BINARY)
 contours, hierarchy = cv2.findContours(img_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 green_output = cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
+for i, c in enumerate(contours):
+    M = cv2.moments(c)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+    cv2.putText(green_output, 'GREEN', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 
 #------------------------------------------------ RED COLOR DETECTION   -----------------------------------------------#
@@ -71,6 +81,11 @@ img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
 thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
 contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+for i, c in enumerate(contours):
+    M = cv2.moments(c)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+    cv2.putText(red_output, 'RED', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 
 #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
@@ -84,6 +99,11 @@ img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
 thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
 contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
+for i, c in enumerate(contours):
+    M = cv2.moments(c)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+    cv2.putText(blue_output, 'BLUE', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 
 #---------------------------------------------- IMAGE PROCESSING    --------------------------------------------------#
