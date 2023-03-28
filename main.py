@@ -4,7 +4,7 @@ import numpy as np
 
 # IMAGE FOLDER AND IMAGE NAME
 images_folder = r'./lego_images/' # USED FOR ALL OS
-lego_image = 'all'
+lego_image = 'y'
 
 # SETTING UP THE KERNEL AND IMAGE
 kernel = np.ones((5, 5), np.uint8)
@@ -38,9 +38,20 @@ yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernel)
 
 # FOR DETECTING AND DRAWING THE CONTOURS OF THE YELLOW MASK
 img_yellow = cv2.cvtColor(yellow_mask, cv2.COLOR_BGR2GRAY)
+blurred = cv2.medianBlur(img_yellow, 25)
 thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
 contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
+
+# CIRCLE DETECTION
+circles = cv2.HoughCircles(img_yellow, cv2.HOUGH_GRADIENT, 1, 10, param1=30, param2=50, minRadius=0, maxRadius=1000)
+
+if circles is not None:
+    detected_circles = np.uint16(np.around(circles))
+    for (x, y, r) in detected_circles[0, :]:
+        cv2.circle(img, (x, y), r, (0, 255, 0), 2)
+
+# COLOUR IDENTIFICATION
 for i, c in enumerate(contours):
     M = cv2.moments(c)
     cx = int(M['m10']/M['m00'])
@@ -122,6 +133,7 @@ contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPR
 # DISPLAYING IMAGES
 # cv2.imshow('picture', img)
 cv2.imshow('red mask', red_output)
+# cv2.imshow('blurred', blurred)
 # cv2.imshow('blue mask', blue_output)
 # cv2.imshow('green mask', green_output)
 
