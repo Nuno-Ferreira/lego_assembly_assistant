@@ -4,7 +4,7 @@ import numpy as np
 
 # IMAGE FOLDER AND IMAGE NAME
 images_folder = r'./lego_images/' # USED FOR ALL OS
-lego_image = 'board2'
+lego_image = 'all'
 
 # SETTING UP THE KERNEL AND IMAGE
 kernel = np.ones((5, 5), np.uint8)
@@ -148,8 +148,10 @@ for i, c in enumerate(contours):
 
 #------------------------------------- DISPLAYING IMAGES    ----------------------------------------------------------#
 
+cv2.namedWindow('picture', cv2.WINDOW_NORMAL)
+cv2.namedWindow('red mask', cv2.WINDOW_NORMAL)
 cv2.imshow('picture', img)
-# cv2.imshow('red mask', red_output)
+cv2.imshow('red mask', red_output)
 # cv2.imshow('blue mask', blue_output)
 # cv2.imshow('green mask', green_output)
 
