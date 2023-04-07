@@ -4,7 +4,7 @@ import numpy as np
 
 # IMAGE FOLDER AND IMAGE NAME
 images_folder = r'./lego_images/' # USED FOR ALL OS
-lego_image = 'y'
+lego_image = 'all'
 
 # SETTING UP THE KERNEL AND IMAGE
 kernel = np.ones((5, 5), np.uint8)
