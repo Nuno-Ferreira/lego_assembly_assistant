@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+#--------------------------------- VARIABLES ---------------------------#
 url = "http://192.168.1.65:8080/video"
 vc = cv2.VideoCapture(url)
 
@@ -20,11 +21,9 @@ upper_green = np.array([80,255,255])
 # MAIN BOARD = 8x16 
 
 
-# ADD PIXEL TO CM RATIO
-pixel_cm_ratio = 1
-
-def get_main_board():
-    mask_green = cv2.inRange(imghsv, lower_green, upper_green)
+# GET THE MAIN BOARD
+def get_main_board(img):
+    mask_green = cv2.inRange(img, lower_green, upper_green)
     img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
     green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
     green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
@@ -35,6 +34,16 @@ def get_main_board():
     contours, hierarchy = cv2.findContours(img_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     green_output = cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
 
+    for cnt in contours:
+    # STILL NEED TO CALCULATE THE RATIO BY THE CONTOUR
+        rect = cv2.minAreaRect() # maybe use this
+        (x, y), (w, h), angle = rect
+
+        height_ratio = h / 16
+        width_ratio = w / 8
+    # NEED TO RETURN THE RATIO 
+
+    return ratio
 
 
 while vc.isOpened():
@@ -49,13 +58,14 @@ while vc.isOpened():
     img_close = cv2.morphologyEx(img_thresh, cv2.MORPH_OPEN, kernel)
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
-    # GETTING THE BIGGEST CONTOUR (MAIN BOARD)
-    rect = cv2.minAreaRect()
-    (x, y), (w, h), angle = rect
+# INSTRUCT THE USER TO PLACE THE MAIN BOARD IN THE CENTER OF THE CAMERA FEED -- maybe use a button input to confirm it's been placed
+# PROCESS THE IMAGE TO DETECT THE MAIN BOARD
+    # GETTING THE RATIO TO CALCULATE THE OTHER PIECES
+    ratio = get_main_board(frame)
 
     # GETTING THE WIDTH AND HEIGHT OF THE MAIN BOARD
-    board_width = w / pixel_cm_ratio
-    board_height = h / pixel_cm_ratio
+    board_width = w / ratio
+    board_height = h / ratio
 
     # DISPLAYING CONTOURS
     for i, c in enumerate(contours):
@@ -80,7 +90,7 @@ cv2.destroyAllWindows()
 # cv2.destroyWindow('stream')
 # vc.release()
 
-# UNUSED CODE
+#--------------------- UNUSED CODE ----------------------------------#
 
     # #img_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     # imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
