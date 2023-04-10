@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-#import os
 
 # IMAGE FOLDER AND IMAGE NAME
 images_folder = r'./lego_images/' # USED FOR ALL OS
