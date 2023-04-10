@@ -3,15 +3,15 @@ import numpy as np
 
 # IMAGE FOLDER AND IMAGE NAME
 images_folder = r'./lego_images/' # USED FOR ALL OS
-lego_image = 'all'
+lego_image = 'board1'
 
 # SETTING UP THE KERNEL AND IMAGE
 kernel = np.ones((5, 5), np.uint8)
 img = cv2.imread(images_folder + lego_image + '.jpeg')
 
 # GREEN COLOR RANGES
-lower_green = np.array([50,50,50])
-upper_green = np.array([80,255,255])
+lower_green = np.array([50,0,0])
+upper_green = np.array([160,255,255])
 
 # YELLOW COLOR RANGES
 lower_yellow = np.array([20,100,100])
@@ -54,23 +54,29 @@ for i, c in enumerate(contours):
 
 #------------------------------------------------- GREEN COLOR DETECTION -----------------------------------------------#
 
-mask_green = cv2.inRange(imghsv, lower_green, upper_green)
+mask_green = cv2.inRange(img, lower_green, upper_green)
 img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
 green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
 green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
 
 # FOR DETECTING AND DRAWING THE CONTOURS OF THE GREEN MASK
 img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
-thr_value, img_thresh = cv2.threshold(img_green, 100, 200, cv2.THRESH_BINARY)
-contours, hierarchy = cv2.findContours(img_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+thr_value, img_thresh = cv2.threshold(img_green, 100, 255, cv2.THRESH_BINARY)
+contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 green_output = cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
 for i, c in enumerate(contours):
-    M = cv2.moments(c)
-    cx = int(M['m10']/M['m00'])
-    cy = int(M['m01']/M['m00'])
-    area = cv2.contourArea(c)
-    cv2.putText(green_output, 'GREEN', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+    # M = cv2.moments(c)
+    # cx = int(M['m10']/M['m00'])
+    # cy = int(M['m01']/M['m00'])
+    # area = cv2.contourArea(c)
+    # cv2.putText(green_output, 'GREEN', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+    rect = cv2.minAreaRect(c) # maybe use this
+    (x, y), (w, h), angle = rect
 
+    height_ratio = h / 16
+    width_ratio = w / 8
+
+    print(height_ratio, width_ratio)
 
 #------------------------------------------------ RED COLOR DETECTION   -----------------------------------------------#
 
@@ -116,26 +122,26 @@ for i, c in enumerate(contours):
 
 #---------------------------------------------- IMAGE PROCESSING    --------------------------------------------------#
 
-img = cv2.imread(images_folder + lego_image + '.jpeg')
-img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-img_blur = cv2.blur(img_gray, (5, 5))
-img_erode = cv2.erode(img_blur, kernel, iterations=2)
-img_dilate = cv2.dilate(img_erode, kernel, iterations=2)
-thr_value, img_thresh = cv2.threshold(img_blur, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # add this: cv2.THRESH_OTSU / OTHER VALUES 50 - 80
-img_close = cv2.morphologyEx(img_thresh, cv2.MORPH_OPEN, kernel)
-contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+# img = cv2.imread(images_folder + lego_image + '.jpeg')
+# img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# img_blur = cv2.blur(img_gray, (5, 5))
+# img_erode = cv2.erode(img_blur, kernel, iterations=2)
+# img_dilate = cv2.dilate(img_erode, kernel, iterations=2)
+# thr_value, img_thresh = cv2.threshold(img_blur, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)  # add this: cv2.THRESH_OTSU / OTHER VALUES 50 - 80
+# img_close = cv2.morphologyEx(img_thresh, cv2.MORPH_OPEN, kernel)
+# contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
-# DISPLAYING CONTOURS
-for i, c in enumerate(contours):
-    x,y,w,h = cv2.boundingRect(c)
-    area = cv2.contourArea(c)
-    length = len(contours[i])
-    if hierarchy[0,i,3] == -1 and len(contours[i]) >= 200:
-        area = cv2.contourArea(c)
-        print('area: ', area)
-        print('length: ', length)
-        # cv2.rectangle(img, (x,y),( x+w,y+h), (0, 255, 0), 2) # USED TO DRAW RECTANGLES AROUND THE PIECES
-        cv2.drawContours(img, contours, i, (0, 255, 0), 2) # USED TO DRAW CONTOURS AROUND THE PIECES
+# # DISPLAYING CONTOURS
+# for i, c in enumerate(contours):
+#     x,y,w,h = cv2.boundingRect(c)
+#     area = cv2.contourArea(c)
+#     length = len(contours[i])
+#     if hierarchy[0,i,3] == -1 and len(contours[i]) >= 200:
+#         area = cv2.contourArea(c)
+#         print('area: ', area)
+#         print('length: ', length)
+#         # cv2.rectangle(img, (x,y),( x+w,y+h), (0, 255, 0), 2) # USED TO DRAW RECTANGLES AROUND THE PIECES
+#         cv2.drawContours(img, contours, i, (0, 255, 0), 2) # USED TO DRAW CONTOURS AROUND THE PIECES
 
 
 
