@@ -6,12 +6,12 @@ images_folder = r'./lego_images/' # USED FOR ALL OS
 lego_image = 'board1'
 
 # SETTING UP THE KERNEL AND IMAGE
-kernel = np.ones((5, 5), np.uint8)
+kernel = np.ones((10, 10), np.uint8)
 img = cv2.imread(images_folder + lego_image + '.jpeg')
 
 # GREEN COLOR RANGES
-lower_green = np.array([50,0,0])
-upper_green = np.array([160,255,255])
+lower_green = np.array([0,150,100])
+upper_green = np.array([90,255,255])
 
 # YELLOW COLOR RANGES
 lower_yellow = np.array([20,100,100])
@@ -54,10 +54,13 @@ for i, c in enumerate(contours):
 
 #------------------------------------------------- GREEN COLOR DETECTION -----------------------------------------------#
 
-mask_green = cv2.inRange(img, lower_green, upper_green)
+imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+mask_green = cv2.inRange(imghsv, lower_green, upper_green)
 img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
-green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
-green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+green_mask = cv2.dilate(img_green_mask, kernel, iterations=2)
+green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_CLOSE, kernel)
+green_mask = cv2.erode(green_mask, kernel, iterations=1)
+# green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
 
 # FOR DETECTING AND DRAWING THE CONTOURS OF THE GREEN MASK
 img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
@@ -77,6 +80,17 @@ for i, c in enumerate(contours):
     width_ratio = w / 8
 
     print(height_ratio, width_ratio)
+
+# MAYBE USE THIS HEIGHT/WIDTH RATIO TO IDENTIFY HOW BIG THE OTHER PIECES ARE
+# I COULD SETUP AN IF STATEMENT TO DISTINGUISH BETWEEN WHAT RATIO TO USE (w/h or h/w)
+"""
+If the goal is to identify the lego board regardless of its orientation, 
+you may need to modify the code to detect the dimensions of the board in
+a more orientation-independent way. One possible approach is to calculate 
+the aspect ratio of the bounding rectangle (w/h or h/w) and use that to 
+identify the board.
+"""
+
 
 #------------------------------------------------ RED COLOR DETECTION   -----------------------------------------------#
 
