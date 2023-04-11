@@ -36,7 +36,7 @@ def get_main_board(img):
 
     for cnt in contours:
     # STILL NEED TO CALCULATE THE RATIO BY THE CONTOUR
-        rect = cv2.minAreaRect() # maybe use this
+        rect = cv2.minAreaRect(cnt) # maybe use this
         (x, y), (w, h), angle = rect
 
         height_ratio = h / 16
