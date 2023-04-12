@@ -104,30 +104,31 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
 # #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
 
-mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
-img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
-blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
-blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
+def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, height_ratio):
+    mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
+    img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
+    blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
+    blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
 
-# FOR DETECTING AND DRAWING THE CONTOURS OF THE BLUE MASK
-img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
-thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
-contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-# blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
-for i, c in enumerate(contours):
+    # FOR DETECTING AND DRAWING THE CONTOURS OF THE BLUE MASK
+    img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
+    thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
+    for i, c in enumerate(contours):
 
-    rect = cv2.minAreaRect(c) 
-    (x, y), (w, h), angle = rect
+        rect = cv2.minAreaRect(c) 
+        (x, y), (w, h), angle = rect
 
-    if h > w:
-        h, w = w, h
+        if h > w:
+            h, w = w, h
 
-    width_studs = w / width_ratio
-    height_studs = h / height_ratio
+        width_studs = w / width_ratio
+        height_studs = h / height_ratio
 
-    if h and w > 50:
-        blue_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
-        print(f'BLUE: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+        if h and w > 50:
+            blue_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
+            print(f'BLUE: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 #------------------------------------------------- YELLOW COLOR DETECTION -----------------------------------------------#
