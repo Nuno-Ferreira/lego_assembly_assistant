@@ -34,34 +34,35 @@ upper_blue = np.array([160,255,255])
 
 #------------------------------------------------- GREEN COLOR DETECTION -----------------------------------------------#
 
-mask_green = cv2.inRange(imghsv, lower_green, upper_green)
-img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
-green_mask = cv2.dilate(img_green_mask, kernel, iterations=2)
-green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_CLOSE, kernel)
-green_mask = cv2.erode(green_mask, kernel, iterations=1)
-# green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+def green_detection(imghsv, img, kernel, lower_green, upper_green):
+    mask_green = cv2.inRange(imghsv, lower_green, upper_green)
+    img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
+    green_mask = cv2.dilate(img_green_mask, kernel, iterations=2)
+    green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_CLOSE, kernel)
+    green_mask = cv2.erode(green_mask, kernel, iterations=1)
+    # green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
 
-# FOR DETECTING AND DRAWING THE CONTOURS OF THE GREEN MASK
-img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
-thr_value, img_thresh = cv2.threshold(img_green, 100, 255, cv2.THRESH_BINARY)
-contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-for i, c in enumerate(contours):
-    # FIND THE MINIMUM AREA RECTANGLE OF THE CONTOUR
-    rect = cv2.minAreaRect(c) 
-    (x, y), (w, h), angle = rect
+    # FOR DETECTING AND DRAWING THE CONTOURS OF THE GREEN MASK
+    img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
+    thr_value, img_thresh = cv2.threshold(img_green, 100, 255, cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    for i, c in enumerate(contours):
+        # FIND THE MINIMUM AREA RECTANGLE OF THE CONTOUR
+        rect = cv2.minAreaRect(c) 
+        (x, y), (w, h), angle = rect
 
-    # MAKE SURE THE WIDTH IS ALWAYS GREATER THAN THE HEIGHT
-    if h > w:
-        h, w = w, h
+        # MAKE SURE THE WIDTH IS ALWAYS GREATER THAN THE HEIGHT
+        if h > w:
+            h, w = w, h
 
-    # IF THE WIDTH AND HEIGHT ARE GREATER THAN 50, THEN USE THOSE MEASUREMENTS FOR THE RATIOS
-    if h and w > 50:
-        # CALCULATE THE HEIGHT AND WIDTH RATIOS BASED ON THE HOW MANY STUDS THE MAIN BOARD HAS
-        height_ratio = h / 8
-        width_ratio = w / 16
+        # IF THE WIDTH AND HEIGHT ARE GREATER THAN 50, THEN USE THOSE MEASUREMENTS FOR THE RATIOS
+        if h and w > 50:
+            # CALCULATE THE HEIGHT AND WIDTH RATIOS BASED ON THE HOW MANY STUDS THE MAIN BOARD HAS
+            height_ratio = h / 8
+            width_ratio = w / 16
 
-        green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 3)
-        print(f'green: {height_ratio, width_ratio}')
+            green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 3)
+            print(f'green: {height_ratio, width_ratio}')
 
 """
 If the goal is to identify the lego board regardless of its orientation, 
