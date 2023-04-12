@@ -10,6 +10,7 @@ kernel = np.ones((10, 10), np.uint8)
 img = cv2.imread(images_folder + lego_image + '.jpg')
 imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
+# SETTING UP THE HEIGHT AND WIDTH RATIOS TO CALCULATE THE NUMBER OF STUDS
 height_ratio = 1
 width_ratio = 1
 
@@ -63,6 +64,8 @@ def green_detection(imghsv, img, kernel, lower_green, upper_green):
 
             green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 3)
             print(f'green: {height_ratio, width_ratio}')
+
+# NEED TO ADD A RETURN STATEMENT TO RETURN THE HEIGHT AND WIDTH RATIOS TO BE USED IN THE OTHER FUNCTIONS
 
 """
 If the goal is to identify the lego board regardless of its orientation, 
