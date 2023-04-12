@@ -5,12 +5,12 @@ import numpy as np
 url = "http://192.168.1.65:8080/video"
 vc = cv2.VideoCapture(url)
 
-kernel = np.ones((5, 5), np.uint8)
+kernel = np.ones((10, 10), np.uint8)
 
 
 # GREEN COLOR RANGES
-lower_green = np.array([50,50,50])
-upper_green = np.array([80,255,255])
+lower_green = np.array([0,150,100])
+upper_green = np.array([90,255,255])
 
 
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED 
