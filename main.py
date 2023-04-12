@@ -8,6 +8,7 @@ lego_image = 'main_board_pieces'
 # SETTING UP THE KERNEL AND IMAGE
 kernel = np.ones((10, 10), np.uint8)
 img = cv2.imread(images_folder + lego_image + '.jpg')
+imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 # GREEN COLOR RANGES
 lower_green = np.array([0,150,100])
@@ -30,7 +31,6 @@ upper_blue = np.array([160,255,255])
 
 #------------------------------------------------- GREEN COLOR DETECTION -----------------------------------------------#
 
-imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_green = cv2.inRange(imghsv, lower_green, upper_green)
 img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
 green_mask = cv2.dilate(img_green_mask, kernel, iterations=2)
@@ -42,22 +42,26 @@ green_mask = cv2.erode(green_mask, kernel, iterations=1)
 img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
 thr_value, img_thresh = cv2.threshold(img_green, 100, 255, cv2.THRESH_BINARY)
 contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-green_output = cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
 for i, c in enumerate(contours):
     # M = cv2.moments(c)
     # cx = int(M['m10']/M['m00'])
     # cy = int(M['m01']/M['m00'])
     # area = cv2.contourArea(c)
     # cv2.putText(green_output, 'GREEN', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+
     rect = cv2.minAreaRect(c) # maybe use this
     (x, y), (w, h), angle = rect
 
-    height_ratio = h / 16
-    width_ratio = w / 8
+    if h > w:
+        h, w = w, h
 
-    aspect_ratio = w / h
+    height_ratio = h /8
+    width_ratio = w / 16
+    #aspect_ratio = w / h
 
-    print(height_ratio, width_ratio, aspect_ratio)
+    if height_ratio and width_ratio > 10:
+        green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 2)
+        print(f'green: {height_ratio, width_ratio}')
 
 # MAYBE USE THIS HEIGHT/WIDTH RATIO TO IDENTIFY HOW BIG THE OTHER PIECES ARE
 # I COULD SETUP AN IF STATEMENT TO DISTINGUISH BETWEEN WHAT RATIO TO USE (w/h or h/w)
@@ -71,7 +75,6 @@ identify the board.
 
 #------------------------------------------------- YELLOW COLOR DETECTION -----------------------------------------------#
 
-imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 mask_yellow = cv2.inRange(imghsv, lower_yellow, upper_yellow)
 img_yellow_mask = cv2.bitwise_and(img, img, mask=mask_yellow)
 yellow_mask = cv2.morphologyEx(img_yellow_mask, cv2.MORPH_CLOSE, kernel)
@@ -95,24 +98,34 @@ for i, c in enumerate(contours):
 
 #------------------------------------------------ RED COLOR DETECTION   -----------------------------------------------#
 
-# mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
-# mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
-# combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
-# img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
-# red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
-# red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
+mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
+combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
+img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
+red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
+red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
 
-# # FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
-# img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
-# thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
-# contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+# FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
+img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
+thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
+contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 # red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
-# for i, c in enumerate(contours):
-#     M = cv2.moments(c)
-#     cx = int(M['m10']/M['m00'])
-#     cy = int(M['m01']/M['m00'])
-#     area = cv2.contourArea(c)
-#     cv2.putText(red_output, 'RED', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+for i, c in enumerate(contours):
+    # M = cv2.moments(c)
+    # cx = int(M['m10']/M['m00'])
+    # cy = int(M['m01']/M['m00'])
+    # area = cv2.contourArea(c)
+    # cv2.putText(red_output, 'RED', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+    rect = cv2.minAreaRect(c) # maybe use this
+    (x, y), (w, h), angle = rect
+
+    height_ratio = h / 8
+    width_ratio = w 
+    aspect_ratio = h / w
+
+    if height_ratio and width_ratio > 10:
+        red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
+        print(f'red: {height_ratio, width_ratio, aspect_ratio}')
 
 
 # #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
@@ -137,7 +150,6 @@ for i, c in enumerate(contours):
 
 #---------------------------------------------- IMAGE PROCESSING    --------------------------------------------------#
 
-# img = cv2.imread(images_folder + lego_image + '.jpeg')
 # img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 # img_blur = cv2.blur(img_gray, (5, 5))
 # img_erode = cv2.erode(img_blur, kernel, iterations=2)
