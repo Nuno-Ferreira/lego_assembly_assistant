@@ -3,11 +3,11 @@ import numpy as np
 
 # IMAGE FOLDER AND IMAGE NAME
 images_folder = r'./lego_images/' # USED FOR ALL OS
-lego_image = 'board1'
+lego_image = 'main_board_pieces'
 
 # SETTING UP THE KERNEL AND IMAGE
 kernel = np.ones((10, 10), np.uint8)
-img = cv2.imread(images_folder + lego_image + '.jpeg')
+img = cv2.imread(images_folder + lego_image + '.jpg')
 
 # GREEN COLOR RANGES
 lower_green = np.array([0,150,100])
@@ -26,30 +26,6 @@ upper_red2 = np.array([180,255,255])
 # BLUE COLOR RANGES
 lower_blue = np.array([90,100,100])
 upper_blue = np.array([160,255,255])
-
-
-#------------------------------------------------- YELLOW COLOR DETECTION -----------------------------------------------#
-
-imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-mask_yellow = cv2.inRange(imghsv, lower_yellow, upper_yellow)
-img_yellow_mask = cv2.bitwise_and(img, img, mask=mask_yellow)
-yellow_mask = cv2.morphologyEx(img_yellow_mask, cv2.MORPH_CLOSE, kernel)
-yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernel)
-
-# FOR DETECTING AND DRAWING THE CONTOURS OF THE YELLOW MASK
-img_yellow = cv2.cvtColor(yellow_mask, cv2.COLOR_BGR2GRAY)
-blurred = cv2.medianBlur(img_yellow, 25)
-thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
-contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
-
-# COLOUR IDENTIFICATION
-for i, c in enumerate(contours):
-    M = cv2.moments(c)
-    cx = int(M['m10']/M['m00'])
-    cy = int(M['m01']/M['m00'])
-    area = cv2.contourArea(c)
-    cv2.putText(yellow_output, 'YELLOW', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 
 #------------------------------------------------- GREEN COLOR DETECTION -----------------------------------------------#
@@ -79,7 +55,9 @@ for i, c in enumerate(contours):
     height_ratio = h / 16
     width_ratio = w / 8
 
-    print(height_ratio, width_ratio)
+    aspect_ratio = w / h
+
+    print(height_ratio, width_ratio, aspect_ratio)
 
 # MAYBE USE THIS HEIGHT/WIDTH RATIO TO IDENTIFY HOW BIG THE OTHER PIECES ARE
 # I COULD SETUP AN IF STATEMENT TO DISTINGUISH BETWEEN WHAT RATIO TO USE (w/h or h/w)
@@ -91,47 +69,70 @@ the aspect ratio of the bounding rectangle (w/h or h/w) and use that to
 identify the board.
 """
 
+#------------------------------------------------- YELLOW COLOR DETECTION -----------------------------------------------#
+
+imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+mask_yellow = cv2.inRange(imghsv, lower_yellow, upper_yellow)
+img_yellow_mask = cv2.bitwise_and(img, img, mask=mask_yellow)
+yellow_mask = cv2.morphologyEx(img_yellow_mask, cv2.MORPH_CLOSE, kernel)
+yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernel)
+
+# FOR DETECTING AND DRAWING THE CONTOURS OF THE YELLOW MASK
+img_yellow = cv2.cvtColor(yellow_mask, cv2.COLOR_BGR2GRAY)
+blurred = cv2.medianBlur(img_yellow, 25)
+thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
+contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
+
+# COLOUR IDENTIFICATION
+for i, c in enumerate(contours):
+    M = cv2.moments(c)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+    area = cv2.contourArea(c)
+    cv2.putText(yellow_output, 'YELLOW', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+
 
 #------------------------------------------------ RED COLOR DETECTION   -----------------------------------------------#
 
-mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
-mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
-combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
-img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
-red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
-red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+# mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
+# mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
+# combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
+# img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
+# red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
+# red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
 
-# FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
-img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
-thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
-contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
-for i, c in enumerate(contours):
-    M = cv2.moments(c)
-    cx = int(M['m10']/M['m00'])
-    cy = int(M['m01']/M['m00'])
-    area = cv2.contourArea(c)
-    cv2.putText(red_output, 'RED', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+# # FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
+# img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
+# thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
+# contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+# red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+# for i, c in enumerate(contours):
+#     M = cv2.moments(c)
+#     cx = int(M['m10']/M['m00'])
+#     cy = int(M['m01']/M['m00'])
+#     area = cv2.contourArea(c)
+#     cv2.putText(red_output, 'RED', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 
-#----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
+# #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
 
-mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
-img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
-blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
-blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
+# mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
+# img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
+# blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
+# blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
 
-# FOR DETECTING AND DRAWING THE CONTOURS OF THE BLUE MASK
-img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
-thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
-contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
-for i, c in enumerate(contours):
-    M = cv2.moments(c)
-    cx = int(M['m10']/M['m00'])
-    cy = int(M['m01']/M['m00'])
-    area = cv2.contourArea(c)
-    cv2.putText(blue_output, 'BLUE', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+# # FOR DETECTING AND DRAWING THE CONTOURS OF THE BLUE MASK
+# img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
+# thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
+# contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+# blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
+# for i, c in enumerate(contours):
+#     M = cv2.moments(c)
+#     cx = int(M['m10']/M['m00'])
+#     cy = int(M['m01']/M['m00'])
+#     area = cv2.contourArea(c)
+#     cv2.putText(blue_output, 'BLUE', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 
 #---------------------------------------------- IMAGE PROCESSING    --------------------------------------------------#
