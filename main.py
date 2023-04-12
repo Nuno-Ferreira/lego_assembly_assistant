@@ -178,6 +178,11 @@ for i, c in enumerate(contours):
 #         # cv2.rectangle(img, (x,y),( x+w,y+h), (0, 255, 0), 2) # USED TO DRAW RECTANGLES AROUND THE PIECES
 #         cv2.drawContours(img, contours, i, (0, 255, 0), 2) # USED TO DRAW CONTOURS AROUND THE PIECES
 
+
+green_detection(imghsv, img, kernel, lower_green, upper_green)
+red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
+blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
+
 #------------------------------------- DISPLAYING IMAGES    ----------------------------------------------------------#
 
 cv2.namedWindow('picture', cv2.WINDOW_NORMAL)
@@ -193,6 +198,7 @@ cv2.destroyAllWindows()
 
 
 #------------------------------------- UNUSED CODE ----------------------------------------------------------#
+
 # REPLACE THIS BY COMPUTING THE SIZE OF THE MAIN BOARD AND THEN COMPARE IT TO THE SIZE OF THE OTHER PIECES TO GET 4X4/3X3/2X2
 # # CIRCLE DETECTION
 # circles = cv2.HoughCircles(img_yellow, cv2.HOUGH_GRADIENT, 1, 10, param1=30, param2=50, minRadius=0, maxRadius=1000)
