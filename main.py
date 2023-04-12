@@ -74,32 +74,33 @@ identify the board.
 
 #------------------------------------------------ RED COLOR DETECTION   -----------------------------------------------#
 
-mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
-mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
-combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
-img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
-red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
-red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio):
+    mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
+    mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
+    combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
+    img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
+    red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
+    red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
 
-# FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
-img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
-thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
-contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-# red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
-for i, c in enumerate(contours):
+    # FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
+    img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
+    thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
+    contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+    for i, c in enumerate(contours):
 
-    rect = cv2.minAreaRect(c) 
-    (x, y), (w, h), angle = rect
+        rect = cv2.minAreaRect(c) 
+        (x, y), (w, h), angle = rect
 
-    if h > w:
-        h, w = w, h
+        if h > w:
+            h, w = w, h
 
-    width_studs = w / width_ratio
-    height_studs = h / height_ratio
+        width_studs = w / width_ratio
+        height_studs = h / height_ratio
 
-    if h and w > 50:
-        red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
-        print(f'red: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+        if h and w > 50:
+            red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
+            print(f'red: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 # #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
 
