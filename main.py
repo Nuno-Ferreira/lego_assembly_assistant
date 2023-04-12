@@ -178,19 +178,6 @@ for i, c in enumerate(contours):
 #         # cv2.rectangle(img, (x,y),( x+w,y+h), (0, 255, 0), 2) # USED TO DRAW RECTANGLES AROUND THE PIECES
 #         cv2.drawContours(img, contours, i, (0, 255, 0), 2) # USED TO DRAW CONTOURS AROUND THE PIECES
 
-
-
-# REPLACE THIS BY COMPUTING THE SIZE OF THE MAIN BOARD AND THEN COMPARE IT TO THE SIZE OF THE OTHER PIECES TO GET 4X4/3X3/2X2
-# # CIRCLE DETECTION
-# circles = cv2.HoughCircles(img_yellow, cv2.HOUGH_GRADIENT, 1, 10, param1=30, param2=50, minRadius=0, maxRadius=1000)
-
-# if circles is not None:
-#     detected_circles = np.uint16(np.around(circles))
-#     for (x, y, r) in detected_circles[0, :]:
-#         cv2.circle(img, (x, y), r, (0, 255, 0), 2)
-
-
-
 #------------------------------------- DISPLAYING IMAGES    ----------------------------------------------------------#
 
 cv2.namedWindow('picture', cv2.WINDOW_NORMAL)
@@ -202,3 +189,15 @@ cv2.imshow('picture', img)
 
 key = cv2.waitKey(0)
 cv2.destroyAllWindows()
+
+
+
+#------------------------------------- UNUSED CODE ----------------------------------------------------------#
+# REPLACE THIS BY COMPUTING THE SIZE OF THE MAIN BOARD AND THEN COMPARE IT TO THE SIZE OF THE OTHER PIECES TO GET 4X4/3X3/2X2
+# # CIRCLE DETECTION
+# circles = cv2.HoughCircles(img_yellow, cv2.HOUGH_GRADIENT, 1, 10, param1=30, param2=50, minRadius=0, maxRadius=1000)
+
+# if circles is not None:
+#     detected_circles = np.uint16(np.around(circles))
+#     for (x, y, r) in detected_circles[0, :]:
+#         cv2.circle(img, (x, y), r, (0, 255, 0), 2)
