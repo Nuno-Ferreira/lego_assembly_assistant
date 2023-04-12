@@ -49,18 +49,19 @@ for i, c in enumerate(contours):
     # area = cv2.contourArea(c)
     # cv2.putText(green_output, 'GREEN', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
-    rect = cv2.minAreaRect(c) # maybe use this
+    rect = cv2.minAreaRect(c) 
     (x, y), (w, h), angle = rect
 
     if h > w:
         h, w = w, h
 
-    height_ratio = h /8
+    # USE THESE RATIOS TO GET HOW MANY STUDS THERE ARE IN THE PIECE ex: h / 8 = 100px -- 700px / 100px = 7 studs
+    height_ratio = h / 8
     width_ratio = w / 16
     #aspect_ratio = w / h
 
     if height_ratio and width_ratio > 10:
-        green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 2)
+        green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 3)
         print(f'green: {height_ratio, width_ratio}')
 
 # MAYBE USE THIS HEIGHT/WIDTH RATIO TO IDENTIFY HOW BIG THE OTHER PIECES ARE
@@ -72,29 +73,6 @@ a more orientation-independent way. One possible approach is to calculate
 the aspect ratio of the bounding rectangle (w/h or h/w) and use that to 
 identify the board.
 """
-
-#------------------------------------------------- YELLOW COLOR DETECTION -----------------------------------------------#
-
-mask_yellow = cv2.inRange(imghsv, lower_yellow, upper_yellow)
-img_yellow_mask = cv2.bitwise_and(img, img, mask=mask_yellow)
-yellow_mask = cv2.morphologyEx(img_yellow_mask, cv2.MORPH_CLOSE, kernel)
-yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernel)
-
-# FOR DETECTING AND DRAWING THE CONTOURS OF THE YELLOW MASK
-img_yellow = cv2.cvtColor(yellow_mask, cv2.COLOR_BGR2GRAY)
-blurred = cv2.medianBlur(img_yellow, 25)
-thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
-contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
-
-# COLOUR IDENTIFICATION
-for i, c in enumerate(contours):
-    M = cv2.moments(c)
-    cx = int(M['m10']/M['m00'])
-    cy = int(M['m01']/M['m00'])
-    area = cv2.contourArea(c)
-    cv2.putText(yellow_output, 'YELLOW', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
-
 
 #------------------------------------------------ RED COLOR DETECTION   -----------------------------------------------#
 
@@ -119,7 +97,7 @@ for i, c in enumerate(contours):
     rect = cv2.minAreaRect(c) # maybe use this
     (x, y), (w, h), angle = rect
 
-    height_ratio = h / 8
+    height_ratio = h 
     width_ratio = w 
     aspect_ratio = h / w
 
@@ -127,7 +105,28 @@ for i, c in enumerate(contours):
         red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
         print(f'red: {height_ratio, width_ratio, aspect_ratio}')
 
+#------------------------------------------------- YELLOW COLOR DETECTION -----------------------------------------------#
 
+mask_yellow = cv2.inRange(imghsv, lower_yellow, upper_yellow)
+img_yellow_mask = cv2.bitwise_and(img, img, mask=mask_yellow)
+yellow_mask = cv2.morphologyEx(img_yellow_mask, cv2.MORPH_CLOSE, kernel)
+yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernel)
+
+# FOR DETECTING AND DRAWING THE CONTOURS OF THE YELLOW MASK
+img_yellow = cv2.cvtColor(yellow_mask, cv2.COLOR_BGR2GRAY)
+blurred = cv2.medianBlur(img_yellow, 25)
+thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
+contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
+
+# COLOUR IDENTIFICATION
+for i, c in enumerate(contours):
+    M = cv2.moments(c)
+    cx = int(M['m10']/M['m00'])
+    cy = int(M['m01']/M['m00'])
+    area = cv2.contourArea(c)
+    cv2.putText(yellow_output, 'YELLOW', (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+    
 # #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
 
 # mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
