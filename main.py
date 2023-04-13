@@ -109,7 +109,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
         if h and w > 50:
             red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
-            print(f'RED: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+            print(f'RED: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 # #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
 
@@ -137,7 +137,7 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
         if h and w > 50:
             blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
-            print(f'BLUE: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+            print(f'BLUE: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 #------------------------------------------------- YELLOW COLOR DETECTION -----------------------------------------------#
