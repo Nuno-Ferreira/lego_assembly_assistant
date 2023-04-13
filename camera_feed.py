@@ -5,6 +5,7 @@ import numpy as np
 url = "http://192.168.1.65:8080/video"
 vc = cv2.VideoCapture(url)
 
+# SETTING UP THE KERNEL
 kernel = np.ones((10, 10), np.uint8)
 
 
@@ -12,6 +13,15 @@ kernel = np.ones((10, 10), np.uint8)
 lower_green = np.array([0,150,100])
 upper_green = np.array([90,255,255])
 
+# RED COLOR RANGES
+lower_red1 = np.array([0,50,50]) # NEED TO ADD THE SECOND MASK TO DETECT RED DUE TO HOW HSV WORKS
+upper_red1 = np.array([5,255,255])
+lower_red2 = np.array([170,50,50]) 
+upper_red2 = np.array([180,255,255])
+
+# BLUE COLOR RANGES
+lower_blue = np.array([90,100,100])
+upper_blue = np.array([160,255,255])
 
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED 
 # USE A GREEN MASK TO DETECT THE BIGGEST CONTOUR (MAIN BOARD) -- CONSISTENT LIGHTING AND CAMERA ANGLE
