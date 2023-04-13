@@ -22,28 +22,96 @@ upper_green = np.array([90,255,255])
 
 
 # GET THE MAIN BOARD
-def get_main_board(img):
-    mask_green = cv2.inRange(img, lower_green, upper_green)
+def get_main_board(imghsv, img, kernel, lower_green, upper_green):
+    
+    # DECLARING THE HEIGHT AND WIDTH RATIOS SO THEY CAN BE USED IN THE OTHER FUNCTIONS
+    global height_ratio, width_ratio
+
+    mask_green = cv2.inRange(imghsv, lower_green, upper_green)
     img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
-    green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
-    green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+    green_mask = cv2.dilate(img_green_mask, kernel, iterations=2)
+    green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_CLOSE, kernel)
+    green_mask = cv2.erode(green_mask, kernel, iterations=1)
+    # green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
 
     # FOR DETECTING AND DRAWING THE CONTOURS OF THE GREEN MASK
     img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
-    thr_value, img_thresh = cv2.threshold(img_green, 100, 200, cv2.THRESH_BINARY)
-    contours, hierarchy = cv2.findContours(img_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    green_output = cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
-
-    for cnt in contours:
-    # STILL NEED TO CALCULATE THE RATIO BY THE CONTOUR
-        rect = cv2.minAreaRect(cnt) # maybe use this
+    thr_value, img_thresh = cv2.threshold(img_green, 100, 255, cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    for i, c in enumerate(contours):
+        # FIND THE MINIMUM AREA RECTANGLE OF THE CONTOUR
+        rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
 
-        height_ratio = h / 16
-        width_ratio = w / 8
-    # NEED TO RETURN THE RATIO 
+        # MAYBE MAKE THIS A SEPARATE FUNCTION SO I CAN USE IT IN OTHER COLOUR FUNCTIONS
+        # MAKE SURE THE WIDTH IS ALWAYS GREATER THAN THE HEIGHT
+        if h > w:
+            h, w = w, h
 
-    return ratio
+        # IF THE WIDTH AND HEIGHT ARE GREATER THAN 50, THEN USE THOSE MEASUREMENTS FOR THE RATIOS
+        if h and w > 50:
+            # CALCULATE THE HEIGHT AND WIDTH RATIOS BASED ON THE HOW MANY STUDS THE MAIN BOARD HAS
+            height_ratio = h / 8
+            width_ratio = w / 16
+
+            green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
+            print(f'GREEN: {height_ratio, width_ratio}')
+
+
+def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio):
+    mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
+    mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
+    combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
+    img_red_mask = cv2.bitwise_and(img, img, mask=combined_mask)
+    red_mask = cv2.morphologyEx(img_red_mask, cv2.MORPH_CLOSE, kernel)
+    red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+
+    # FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
+    img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
+    thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
+    contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+    for i, c in enumerate(contours):
+
+        rect = cv2.minAreaRect(c) 
+        (x, y), (w, h), angle = rect
+
+        if h > w:
+            h, w = w, h
+
+        width_studs = w / width_ratio
+        height_studs = h / height_ratio
+
+        if h and w > 50:
+            red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
+            print(f'RED: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+
+
+def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, height_ratio):
+    mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
+    img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
+    blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
+    blue_mask = cv2.morphologyEx(blue_mask, cv2.MORPH_OPEN, kernel)
+
+    # FOR DETECTING AND DRAWING THE CONTOURS OF THE BLUE MASK
+    img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
+    thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    # blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
+    for i, c in enumerate(contours):
+
+        rect = cv2.minAreaRect(c) 
+        (x, y), (w, h), angle = rect
+
+        if h > w:
+            h, w = w, h
+
+        width_studs = w / width_ratio
+        height_studs = h / height_ratio
+
+        if h and w > 50:
+            blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
+            print(f'BLUE: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 while vc.isOpened():
@@ -61,11 +129,11 @@ while vc.isOpened():
 # INSTRUCT THE USER TO PLACE THE MAIN BOARD IN THE CENTER OF THE CAMERA FEED -- maybe use a button input to confirm it's been placed
 # PROCESS THE IMAGE TO DETECT THE MAIN BOARD
     # GETTING THE RATIO TO CALCULATE THE OTHER PIECES
-    ratio = get_main_board(frame)
+    #ratio = get_main_board(frame) #need to change this
 
     # GETTING THE WIDTH AND HEIGHT OF THE MAIN BOARD
-    board_width = w / ratio
-    board_height = h / ratio
+    # board_width = w / ratio
+    # board_height = h / ratio
 
     # DISPLAYING CONTOURS
     for i, c in enumerate(contours):
@@ -108,3 +176,26 @@ cv2.destroyAllWindows()
     # key = cv2.waitKey(1)
     # if key == 27:
     #     break
+
+# def get_main_board(img):
+#     mask_green = cv2.inRange(img, lower_green, upper_green)
+#     img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
+#     green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
+#     green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+
+#     # FOR DETECTING AND DRAWING THE CONTOURS OF THE GREEN MASK
+#     img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
+#     thr_value, img_thresh = cv2.threshold(img_green, 100, 200, cv2.THRESH_BINARY)
+#     contours, hierarchy = cv2.findContours(img_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+#     green_output = cv2.drawContours(img, contours, -1, (0, 255, 0), 2)
+
+#     for cnt in contours:
+#     # STILL NEED TO CALCULATE THE RATIO BY THE CONTOUR
+#         rect = cv2.minAreaRect(cnt) # maybe use this
+#         (x, y), (w, h), angle = rect
+
+#         height_ratio = h / 16
+#         width_ratio = w / 8
+#     # NEED TO RETURN THE RATIO 
+
+#     return ratio
