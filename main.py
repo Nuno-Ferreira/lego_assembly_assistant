@@ -11,8 +11,8 @@ img = cv2.imread(images_folder + lego_image + '.jpg')
 imghsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 # SETTING UP THE HEIGHT AND WIDTH RATIOS TO CALCULATE THE NUMBER OF STUDS
-height_ratio = 1
-width_ratio = 1
+# height_ratio = 1 # maybe can delete these
+# width_ratio = 1
 
 # GREEN COLOR RANGES
 lower_green = np.array([0,150,100])
@@ -35,7 +35,11 @@ upper_blue = np.array([160,255,255])
 
 #------------------------------------------------- GREEN COLOR DETECTION -----------------------------------------------#
 
-def green_detection(imghsv, img, kernel, lower_green, upper_green, width_ratio, height_ratio):
+def green_detection(imghsv, img, kernel, lower_green, upper_green):
+    
+    # DECLARING THE HEIGHT AND WIDTH RATIOS SO THEY CAN BE USED IN THE OTHER FUNCTIONS
+    global height_ratio, width_ratio
+
     mask_green = cv2.inRange(imghsv, lower_green, upper_green)
     img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
     green_mask = cv2.dilate(img_green_mask, kernel, iterations=2)
@@ -63,11 +67,11 @@ def green_detection(imghsv, img, kernel, lower_green, upper_green, width_ratio, 
             height_ratio = h / 8
             width_ratio = w / 16
 
-            green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 3)
+            green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
             print(f'GREEN: {height_ratio, width_ratio}')
 
 # NEED TO ADD A RETURN STATEMENT TO RETURN THE HEIGHT AND WIDTH RATIOS TO BE USED IN THE OTHER FUNCTIONS
-    return height_ratio, width_ratio
+    # return height_ratio, width_ratio # MAYBE DELETE THIS
 
 """
 If the goal is to identify the lego board regardless of its orientation, 
@@ -104,7 +108,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
         height_studs = h / height_ratio
 
         if h and w > 50:
-            red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
+            red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
             print(f'RED: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 # #----------------------------------------------- BLUE COLOR DETECTION   -----------------------------------------------#
@@ -132,7 +136,7 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
         height_studs = h / height_ratio
 
         if h and w > 50:
-            blue_output = cv2.drawContours(img, c, -1, (0, 0, 255), 2)
+            blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
             print(f'BLUE: {int(height_studs), int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
@@ -181,7 +185,7 @@ for i, c in enumerate(contours):
 #         cv2.drawContours(img, contours, i, (0, 255, 0), 2) # USED TO DRAW CONTOURS AROUND THE PIECES
 
 
-green_detection(imghsv, img, kernel, lower_green, upper_green, width_ratio, height_ratio)
+green_detection(imghsv, img, kernel, lower_green, upper_green)
 red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
 blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
 
