@@ -1,9 +1,12 @@
 import cv2
 import numpy as np
+import time
 
 #--------------------------------- VARIABLES ---------------------------#
 url = "http://192.168.1.65:8080/video"
 vc = cv2.VideoCapture(url)
+
+# NEED TO FIX HOW SLOW THE CAMERA FEED IS
 
 # SETTING UP THE KERNEL
 kernel = np.ones((10, 10), np.uint8)
@@ -66,6 +69,7 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
 
             green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
             print(f'GREEN: {height_ratio, width_ratio}')
+    time.sleep(2)
 
 
 def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio):
@@ -95,6 +99,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
         if h and w > 50:
             red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
             print(f'RED: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+    time.sleep(2)
 
 
 def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, height_ratio):
@@ -122,6 +127,7 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
         if h and w > 50:
             blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
             print(f'BLUE: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+    # time.sleep(5)
 
 
 while vc.isOpened():
