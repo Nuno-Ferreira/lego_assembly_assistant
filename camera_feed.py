@@ -17,7 +17,7 @@ lower_green = np.array([0,150,100])
 upper_green = np.array([90,255,255])
 
 # RED COLOR RANGES
-lower_red1 = np.array([0,50,50]) # NEED TO ADD THE SECOND MASK TO DETECT RED DUE TO HOW HSV WORKS
+lower_red1 = np.array([0,50,50]) # THE SECOND MASK IS USED TO DETECT THE FULL RANGE OF RED DUE TO HOW HSV WORKS
 upper_red1 = np.array([5,255,255])
 lower_red2 = np.array([170,50,50]) 
 upper_red2 = np.array([180,255,255])
@@ -51,7 +51,7 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
     img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
     thr_value, img_thresh = cv2.threshold(img_green, 100, 255, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    for i, c in enumerate(contours):
+    for c in enumerate(contours):
         # FIND THE MINIMUM AREA RECTANGLE OF THE CONTOUR
         rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
@@ -82,10 +82,10 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
     # FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
     img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
-    thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
+    # thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
     contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     # red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
-    for i, c in enumerate(contours):
+    for c in enumerate(contours):
 
         rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
@@ -110,10 +110,10 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
     # FOR DETECTING AND DRAWING THE CONTOURS OF THE BLUE MASK
     img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
-    thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
+    # thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     # blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
-    for i, c in enumerate(contours):
+    for c in enumerate(contours):
 
         rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
