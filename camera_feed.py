@@ -33,6 +33,8 @@ upper_blue = np.array([160,255,255])
 # COMPUTE THE AREA OF THE BOARD AND USE IT TO DETECT THE PIECES
 # MAIN BOARD = 8x16 
 
+frame_rate = 25
+prev = 0
 
 # GET THE MAIN BOARD
 def get_main_board(imghsv, img, kernel, lower_green, upper_green):
@@ -51,7 +53,7 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
     img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
     thr_value, img_thresh = cv2.threshold(img_green, 100, 255, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(img_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    for c in enumerate(contours):
+    for c in contours:
         # FIND THE MINIMUM AREA RECTANGLE OF THE CONTOUR
         rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
@@ -69,7 +71,7 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
 
             green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
             print(f'GREEN: {height_ratio, width_ratio}')
-    time.sleep(2)
+
 
 
 def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio):
@@ -85,7 +87,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
     # thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
     contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     # red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
-    for c in enumerate(contours):
+    for c in contours:
 
         rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
@@ -99,7 +101,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
         if h and w > 50:
             red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
             print(f'RED: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
-    time.sleep(2)
+
 
 
 def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, height_ratio):
@@ -113,7 +115,7 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
     # thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     # blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
-    for c in enumerate(contours):
+    for c in contours:
 
         rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
@@ -131,8 +133,11 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
 
 while vc.isOpened():
+    time_elapsed = time.time() - prev
     ret, frame = vc.read()
 
+    if time_elapsed > 1./frame_rate:
+        prev = time.time()
     imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # IMAGE PROCESSING
