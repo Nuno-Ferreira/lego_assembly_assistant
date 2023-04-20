@@ -180,13 +180,22 @@ while vc.isOpened():
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
+    yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
 
     if counter == 100:
-        if red_width_studs and red_height_studs > 0:
-            print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-        if blue_width_studs and blue_height_studs > 0:
-            print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+        print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+        print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
         counter = 0
+
+    # if counter == 100:
+    #     if red_width_studs and red_height_studs > 0:
+    #         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+    #     if blue_width_studs and blue_height_studs > 0:
+    #         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+    #     if yellow_width_studs and yellow_height_studs > 0:
+    #         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
+    #     counter = 0
 
     # red_current_state = red_width_studs, red_height_studs
     # blue_current_state = blue_width_studs, blue_height_studs
