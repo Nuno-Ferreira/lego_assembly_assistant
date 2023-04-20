@@ -70,7 +70,7 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
             width_ratio = w / 16
 
             green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
-            print(f'GREEN: {height_ratio, width_ratio}')
+            # print(f'GREEN: {height_ratio, width_ratio}')
 
 
 
@@ -102,7 +102,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
         if h and w > 50:
             red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
-            print(f'RED: {int(red_height_studs)}x{int(red_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+            # print(f'RED: {int(red_height_studs)}x{int(red_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 
@@ -132,8 +132,12 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
         if h and w > 50:
             blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
-            print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+            # print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
+red_prev_state = None
+blue_prev_state = None
+
+counter = 0
 
 while vc.isOpened():
     # time_elapsed = time.time() - prev
@@ -173,13 +177,27 @@ while vc.isOpened():
     # board_width = w / ratio
     # board_height = h / ratio
 
+    counter += 1
+
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
 
+    if counter == 100:
+        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')     
+        print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+        counter = 0
 
-    print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-    print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+    # red_current_state = red_width_studs, red_height_studs
+    # blue_current_state = blue_width_studs, blue_height_studs
+
+    # if red_current_state != red_prev_state:
+    #     print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+    #     red_prev_state = red_current_state
+
+    # if blue_current_state != blue_prev_state:
+    #     print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+    #     blue_prev_state = blue_current_state
 
 
     cv2.imshow("Frame", frame)
