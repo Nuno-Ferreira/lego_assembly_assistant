@@ -3,8 +3,8 @@ import numpy as np
 import time
 
 #--------------------------------- VARIABLES ---------------------------#
-url = "http://192.168.1.65:8080/video"
-vc = cv2.VideoCapture(url)
+url = "http://192.168.1.65:8080/video" # USING THE PHONE AS A WEBCAM
+vc = cv2.VideoCapture(1)
 
 # NEED TO FIX HOW SLOW THE CAMERA FEED IS
 
@@ -75,6 +75,8 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
 
 
 def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio):
+    global red_width_studs, red_height_studs
+
     mask_red = cv2.inRange(imghsv, lower_red1, upper_red1)
     mask_red2 = cv2.inRange(imghsv, lower_red2, upper_red2)
     combined_mask = cv2.bitwise_or(mask_red, mask_red2) # COMBINE THE TWO MASKS TO DETECT RED
@@ -95,16 +97,18 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
         if h > w:
             h, w = w, h
 
-        width_studs = w / width_ratio
-        height_studs = h / height_ratio
+        red_width_studs = w / width_ratio
+        red_height_studs = h / height_ratio
 
         if h and w > 50:
             red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
-            print(f'RED: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+            print(f'RED: {int(red_height_studs)}x{int(red_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 
 def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, height_ratio):
+    global blue_width_studs, blue_height_studs
+
     mask_blue = cv2.inRange(imghsv, lower_blue, upper_blue)
     img_blue_mask = cv2.bitwise_and(img, img, mask=mask_blue)
     blue_mask = cv2.morphologyEx(img_blue_mask, cv2.MORPH_CLOSE, kernel)
@@ -123,21 +127,20 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
         if h > w:
             h, w = w, h
 
-        width_studs = w / width_ratio
-        height_studs = h / height_ratio
+        blue_width_studs = w / width_ratio
+        blue_height_studs = h / height_ratio
 
         if h and w > 50:
             blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
-            print(f'BLUE: {int(height_studs)}x{int(width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
-    # time.sleep(5)
+            print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 while vc.isOpened():
-    time_elapsed = time.time() - prev
+    # time_elapsed = time.time() - prev
     ret, frame = vc.read()
 
-    if time_elapsed > 1./frame_rate:
-        prev = time.time()
+    # if time_elapsed > 1./frame_rate:
+    #     prev = time.time()
     imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     # IMAGE PROCESSING
@@ -175,14 +178,16 @@ while vc.isOpened():
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
 
 
+    print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+    print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
 
-    if frame is not None:
-        cv2.imshow("Frame", frame)
+
+    cv2.imshow("Frame", frame)
     q = cv2.waitKey(1)
     if q==ord("q"):
         break
 cv2.destroyAllWindows()
-
+vc.release()
 # cv2.destroyWindow('stream')
 # vc.release()
 
