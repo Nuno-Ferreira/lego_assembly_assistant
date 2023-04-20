@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
-import time
+
+
+print("Starting program...")
 
 #--------------------------------- VARIABLES ---------------------------#
 url = "http://192.168.1.65:8080/video" # USING THE PHONE AS A WEBCAM
@@ -160,6 +162,8 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 
 counter = 0
 
+print('Starting the while loop...')
+
 while vc.isOpened():
     # READ THE FRAME AND CONVERT IT TO HSV
     ret, frame = vc.read()
@@ -170,8 +174,18 @@ while vc.isOpened():
 
     # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE 
     # COULD ADD A COUNTER AND KEEP IT AT 1 UNTIL THE PROGRAM IS CLOSED
-
+    print('Place the main green board in the center of the camera feed and press "q" to continue')
+    q = cv2.waitKey(1)
+    if q==ord("q"):
+        break
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+    print('Make sure that the whole main board is selected in the image and then press "w" to continue')
+    w = cv2.waitKey(1)
+    if w==ord("w"):
+        break
+
+    # AND THEN CONTINUE TO DETECT THE OTHER COLORS
+    # get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
