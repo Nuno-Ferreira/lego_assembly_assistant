@@ -161,13 +161,15 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 counter = 0
 
 while vc.isOpened():
+    # READ THE FRAME AND CONVERT IT TO HSV
     ret, frame = vc.read()
-
     imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+    # SET THE COUNTER
     counter += 1
 
-    # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED 
+    # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE 
+    # COULD ADD A COUNTER AND KEEP IT AT 1 UNTIL THE PROGRAM IS CLOSED
 
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
