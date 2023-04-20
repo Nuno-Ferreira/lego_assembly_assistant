@@ -36,11 +36,11 @@ upper_yellow = np.array([50,255,255])
 board_counter = 0
 def main_board(board_counter):
     print('Place the main green board in the center of the camera feed and press "q" to continue')
-    q = cv2.waitKey(1)
+    q = cv2.waitKey(0)
     if q==ord("q"):
         get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     print('Make sure that the whole main board is selected in the image and then press "w" to continue')
-    w = cv2.waitKey(1)
+    w = cv2.waitKey(0)
     if w==ord("w"):
         board_counter += 1
 
@@ -191,6 +191,7 @@ while vc.isOpened():
     if board_counter == 0:
         main_board(board_counter)
 
+    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame.')
     # STILL NEED TO ADD GREEN DETECTION INDEPENDENTLY FROM THE MAIN BOARD
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
@@ -228,8 +229,7 @@ while vc.isOpened():
         break
 cv2.destroyAllWindows()
 vc.release()
-# cv2.destroyWindow('stream')
-# vc.release()
+
 
 #--------------------- UNUSED CODE ----------------------------------#
 
