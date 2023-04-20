@@ -26,12 +26,11 @@ upper_red2 = np.array([180,255,255])
 lower_blue = np.array([90,100,100])
 upper_blue = np.array([160,255,255])
 
+# YELLOW COLOR RANGES
+lower_yellow = np.array([20,100,100])
+upper_yellow = np.array([50,255,255])
+
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED 
-# USE A GREEN MASK TO DETECT THE BIGGEST CONTOUR (MAIN BOARD) -- CONSISTENT LIGHTING AND CAMERA ANGLE
-# USE ONE OF THE FRAMES TO CALCULATE THE RATIOS BETWEEN PIXELS AND CM
-# USE THAT RATIO TO CALCULATE THE SIZE OF THE LEGO PIECES
-# COMPUTE THE AREA OF THE BOARD AND USE IT TO DETECT THE PIECES
-# MAIN BOARD = 8x16 
 
 frame_rate = 25
 prev = 0
@@ -134,17 +133,46 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
             blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
             # print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
-red_prev_state = None
-blue_prev_state = None
+
+def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio):
+    global yellow_width_studs, yellow_height_studs
+
+    mask_yellow = cv2.inRange(imghsv, lower_yellow, upper_yellow)
+    img_yellow_mask = cv2.bitwise_and(img, img, mask=mask_yellow)
+    yellow_mask = cv2.morphologyEx(img_yellow_mask, cv2.MORPH_CLOSE, kernel)
+    yellow_mask = cv2.morphologyEx(yellow_mask, cv2.MORPH_OPEN, kernel)
+
+    # FOR DETECTING AND DRAWING THE CONTOURS OF THE YELLOW MASK
+    img_yellow = cv2.cvtColor(yellow_mask, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.medianBlur(img_yellow, 25)
+    thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
+    contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
+
+    for c in contours:
+        
+        rect = cv2.minAreaRect(c) 
+        (x, y), (w, h), angle = rect
+
+        if h > w:
+            h, w = w, h
+
+        yellow_width_studs = w / width_ratio
+        yellow_height_studs = h / height_ratio
+
+        if h and w > 50:
+            yellow_output = cv2.drawContours(img, c, -1, (0, 255, 255), 4)
+            # print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+
+
+# red_prev_state = None
+# blue_prev_state = None
 
 counter = 0
 
 while vc.isOpened():
-    # time_elapsed = time.time() - prev
     ret, frame = vc.read()
 
-    # if time_elapsed > 1./frame_rate:
-    #     prev = time.time()
     imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     counter += 1
