@@ -6,11 +6,8 @@ import time
 url = "http://192.168.1.65:8080/video" # USING THE PHONE AS A WEBCAM
 vc = cv2.VideoCapture(1)
 
-# NEED TO FIX HOW SLOW THE CAMERA FEED IS
-
 # SETTING UP THE KERNEL
 kernel = np.ones((10, 10), np.uint8)
-
 
 # GREEN COLOR RANGES
 lower_green = np.array([0,150,100])
@@ -30,10 +27,6 @@ upper_blue = np.array([160,255,255])
 lower_yellow = np.array([20,100,100])
 upper_yellow = np.array([50,255,255])
 
-# TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED 
-
-frame_rate = 25
-prev = 0
 
 # GET THE MAIN BOARD
 def get_main_board(imghsv, img, kernel, lower_green, upper_green):
@@ -87,7 +80,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
     img_red = cv2.cvtColor(red_mask, cv2.COLOR_BGR2GRAY)
     # thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
     contours, hierarchy= cv2.findContours(img_red, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    # red_output = cv2.drawContours(img, contours, -1, (0, 0, 255), 2)
+
     for c in contours:
 
         rect = cv2.minAreaRect(c) 
@@ -101,7 +94,6 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
         if h and w > 50:
             red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
-            # print(f'RED: {int(red_height_studs)}x{int(red_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 
@@ -117,7 +109,7 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
     img_blue = cv2.cvtColor(blue_mask, cv2.COLOR_BGR2GRAY)
     # thr_value, img_thresh = cv2.threshold(img_blue, 100, 200, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(img_blue, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    # blue_output = cv2.drawContours(img, contours, -1, (255, 0, 0), 2)
+
     for c in contours:
 
         rect = cv2.minAreaRect(c) 
@@ -131,7 +123,7 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
         if h and w > 50:
             blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
-            # print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
+
 
 
 def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio):
@@ -147,7 +139,6 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
     blurred = cv2.medianBlur(img_yellow, 25)
     thr_value, img_thresh = cv2.threshold(img_yellow, 100, 200, cv2.THRESH_BINARY)
     contours, hierarchy = cv2.findContours(img_yellow, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    yellow_output = cv2.drawContours(img, contours, -1, (0, 255, 255), 2)
 
     for c in contours:
         
@@ -162,7 +153,6 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 
         if h and w > 50:
             yellow_output = cv2.drawContours(img, c, -1, (0, 255, 255), 4)
-            # print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)} \n' f'height: {h} \n' f'width: {w} \n')
 
 
 # red_prev_state = None
@@ -176,6 +166,8 @@ while vc.isOpened():
     imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     counter += 1
+
+    # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED 
 
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
