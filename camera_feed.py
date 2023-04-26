@@ -34,18 +34,13 @@ upper_yellow = np.array([50,255,255])
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE TO THE NEXT STEP
 board_counter = 0
 def main_board(board_counter):
-    print('Place the main green board in the center of the camera feed and press "c" to continue')
-    wait_for_key('c')
+    print('Place the main green board in the center of the camera feed and press Enter to continue')
+    input()
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
-    print('Make sure that the whole main board is selected in the image and then press "w" to continue')
-    wait_for_key('w')
+    print('Make sure that the whole main board is selected in the image and then press Enter to continue')
+    input()
     board_counter += 1
 
-def wait_for_key(key):
-    while True:
-        key = cv2.waitKey(1)
-        if key == ord(key):
-            break
 
 # GET THE MAIN BOARD
 def get_main_board(imghsv, img, kernel, lower_green, upper_green):
@@ -221,8 +216,8 @@ while vc.isOpened():
     if board_counter == 0:
         main_board(board_counter)
 
-    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press "c" to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
-    wait_for_key('c')
+    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
+    input()
 
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
