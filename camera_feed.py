@@ -31,20 +31,21 @@ upper_yellow = np.array([50,255,255])
 
 
 #--------------------------------- FUNCTIONS ---------------------------#
-# TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE 
-# COULD ADD A COUNTER AND KEEP IT AT 1 UNTIL THE PROGRAM IS CLOSED
+# TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE TO THE NEXT STEP
 board_counter = 0
 def main_board(board_counter):
-    print('Place the main green board in the center of the camera feed and press "q" to continue')
-    q = cv2.waitKey(0)
-    if q==ord("q"):
-        get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+    print('Place the main green board in the center of the camera feed and press "c" to continue')
+    wait_for_key('c')
+    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     print('Make sure that the whole main board is selected in the image and then press "w" to continue')
-    w = cv2.waitKey(0)
-    if w==ord("w"):
-        board_counter += 1
+    wait_for_key('w')
+    board_counter += 1
 
-
+def wait_for_key(key):
+    while True:
+        key = cv2.waitKey(1)
+        if key == ord(f"{key}"):
+            break
 
 # GET THE MAIN BOARD
 def get_main_board(imghsv, img, kernel, lower_green, upper_green):
@@ -191,8 +192,9 @@ while vc.isOpened():
     if board_counter == 0:
         main_board(board_counter)
 
-    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame.')
-    # STILL NEED TO ADD GREEN DETECTION INDEPENDENTLY FROM THE MAIN BOARD
+    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press "c" to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
+    wait_for_key('c')
+
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
