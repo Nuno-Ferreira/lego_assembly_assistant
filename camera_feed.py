@@ -44,7 +44,7 @@ def main_board(board_counter):
 def wait_for_key(key):
     while True:
         key = cv2.waitKey(1)
-        if key == ord(f"{key}"):
+        if key == ord(key):
             break
 
 # GET THE MAIN BOARD
@@ -82,6 +82,35 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
 
             green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
             # print(f'GREEN: {height_ratio, width_ratio}')
+
+
+
+def green_detection(imghsv, img, kernel, lower_green, upper_green, width_ratio, height_ratio):
+    global green_width_studs, green_height_studs
+
+    mask_green = cv2.inRange(imghsv, lower_green, upper_green)
+    img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
+    green_mask = cv2.morphologyEx(img_green_mask, cv2.MORPH_CLOSE, kernel)
+    green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+
+    # FOR DETECTING AND DRAWING THE CONTOURS OF THE RED MASK
+    img_green = cv2.cvtColor(green_mask, cv2.COLOR_BGR2GRAY)
+    # thr_value, img_thresh = cv2.threshold(img_red, 100, 200, cv2.THRESH_BINARY)
+    contours, hierarchy= cv2.findContours(img_green, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
+    for c in contours:
+
+        rect = cv2.minAreaRect(c) 
+        (x, y), (w, h), angle = rect
+
+        if h > w:
+            h, w = w, h
+
+        green_width_studs = w / width_ratio
+        green_height_studs = h / height_ratio
+
+        if h and w > 50:
+            green_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
 
 
 
