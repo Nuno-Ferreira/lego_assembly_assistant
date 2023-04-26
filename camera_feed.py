@@ -64,7 +64,6 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
         rect = cv2.minAreaRect(c) 
         (x, y), (w, h), angle = rect
 
-        # MAYBE MAKE THIS A SEPARATE FUNCTION SO I CAN USE IT IN OTHER COLOUR FUNCTIONS
         # MAKE SURE THE WIDTH IS ALWAYS GREATER THAN THE HEIGHT
         if h > w:
             h, w = w, h
@@ -76,7 +75,6 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
             width_ratio = w / 16
 
             green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
-            # print(f'GREEN: {height_ratio, width_ratio}')
 
 
 
@@ -214,8 +212,10 @@ while vc.isOpened():
     counter += 1
     
     if board_counter == 0:
+        cv2.imshow("Frame", frame) # NEED TO FIX THIS SHOWING FRAME ISSUE -- IT MIGHT BE BECAUSE IT'S NOT IN THE WHILE LOOP
         main_board(board_counter)
 
+    cv2.imshow("Frame", frame)
     print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
     input()
 
