@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import threading
 
 
 print("Starting program...")
@@ -196,12 +197,33 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
             yellow_output = cv2.drawContours(img, c, -1, (0, 255, 255), 4)
 
 
+
+def display_feed():
+    global frame, imghsv
+    while vc.isOpened():
+        ret, frame = vc.read()
+        imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        cv2.imshow("Frame", frame)
+        if cv2.waitKey(1) == 27:
+            break
+    cv2.destroyAllWindows()
+    vc.release()
+
 # red_prev_state = None
 # blue_prev_state = None
 
 counter = 0
 
 print('Starting the while loop...')
+
+t1 = threading.Thread(target=display_feed)
+t2 = threading.Thread(target=main_board, args=(board_counter,))
+
+t1.start()
+t2.start()
+
+t1.join()
+t2.join()
 
 while vc.isOpened():
     # READ THE FRAME AND CONVERT IT TO HSV
