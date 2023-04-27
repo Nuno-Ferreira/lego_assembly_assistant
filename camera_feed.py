@@ -203,7 +203,7 @@ def user_interface():
     input()
 
 
-    
+
 def display_feed():
     global frame, imghsv
     while vc.isOpened():
@@ -222,13 +222,10 @@ def display_feed():
     cv2.destroyAllWindows()
     vc.release()
 
-# red_prev_state = None
-# blue_prev_state = None
-
-counter = 0
 
 print('Starting the while loop...')
 
+#------------------THREADING------------------#
 t1 = threading.Thread(target=display_feed)
 t2 = threading.Thread(target=main_board, args=(board_counter,))
 
@@ -237,6 +234,10 @@ t2.start()
 
 t1.join()
 t2.join()
+
+
+#------------------MAIN------------------#
+counter = 0
 
 while vc.isOpened():
     # READ THE FRAME AND CONVERT IT TO HSV
@@ -262,27 +263,6 @@ while vc.isOpened():
         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
         counter = 0
-
-    # if counter == 100:
-    #     if red_width_studs and red_height_studs > 0:
-    #         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-    #     if blue_width_studs and blue_height_studs > 0:
-    #         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
-    #     if yellow_width_studs and yellow_height_studs > 0:
-    #         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
-    #     counter = 0
-
-    # red_current_state = red_width_studs, red_height_studs
-    # blue_current_state = blue_width_studs, blue_height_studs
-
-    # if red_current_state != red_prev_state:
-    #     print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-    #     red_prev_state = red_current_state
-
-    # if blue_current_state != blue_prev_state:
-    #     print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
-    #     blue_prev_state = blue_current_state
-
 
     cv2.imshow("Frame", frame)
     if cv2.waitKey(1) == 27:
