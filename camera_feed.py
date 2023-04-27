@@ -30,6 +30,17 @@ upper_blue = np.array([160,255,255])
 lower_yellow = np.array([20,100,100])
 upper_yellow = np.array([50,255,255])
 
+# DECLARING THE HEIGHT AND WIDTH RATIOS SO THEY CAN BE USED IN THE OTHER FUNCTIONS
+width_ratio = 0
+height_ratio = 0
+green_width_studs = 0
+green_height_studs = 0
+red_width_studs = 0
+red_height_studs = 0
+blue_width_studs = 0
+blue_height_studs = 0
+yellow_width_studs = 0
+yellow_height_studs = 0
 
 #--------------------------------- FUNCTIONS ---------------------------#
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE TO THE NEXT STEP
@@ -207,8 +218,8 @@ def user_interface():
 def display_info():
     counter = 0
     while vc.isOpened():
-        counter += 1
-        if counter == 100:
+        counter += 0.5
+        if counter == 1000000:
             print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
             print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
             print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
@@ -217,19 +228,9 @@ def display_info():
 
 def display_feed():
     global frame, imghsv
-    counter = 0
     while vc.isOpened():
         ret, frame = vc.read()
         imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-        # NEED TO PUT THIS IN A SEPARATE FUNCTION
-        # counter += 1
-
-        # if counter == 100:
-        #     print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-        #     print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
-        #     print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
-        #     counter = 0
 
         cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 27:
