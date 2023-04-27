@@ -198,11 +198,24 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 
 
 
+def user_interface():
+    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
+    input()
+
+
+    
 def display_feed():
     global frame, imghsv
     while vc.isOpened():
         ret, frame = vc.read()
         imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        if counter == 100:
+            print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+            print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+            print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
+            counter = 0
+
         cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 27:
             break
@@ -237,7 +250,6 @@ while vc.isOpened():
         cv2.imshow("Frame", frame) # NEED TO FIX THIS SHOWING FRAME ISSUE -- IT MIGHT BE BECAUSE IT'S NOT IN THE WHILE LOOP
         main_board(board_counter)
 
-    cv2.imshow("Frame", frame)
     print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
     input()
 
