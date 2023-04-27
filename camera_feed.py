@@ -206,9 +206,12 @@ def user_interface():
 
 def display_feed():
     global frame, imghsv
+    counter = 0
     while vc.isOpened():
         ret, frame = vc.read()
         imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        counter += 1
 
         if counter == 100:
             print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
@@ -223,20 +226,31 @@ def display_feed():
     vc.release()
 
 
-print('Starting the while loop...')
+print('Starting the threads...')
 
 #------------------THREADING------------------#
-t1 = threading.Thread(target=display_feed)
-t2 = threading.Thread(target=main_board, args=(board_counter,))
+t_display_feed = threading.Thread(target=display_feed)
+t_main_board = threading.Thread(target=main_board, args=(board_counter,))
+t_red = threading.Thread(target=red_detection, args=(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio))
+t_blue = threading.Thread(target=blue_detection, args=(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio))
+t_yellow = threading.Thread(target=yellow_detection, args=(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio))
 
-t1.start()
-t2.start()
 
-t1.join()
-t2.join()
+t_display_feed.start()
+t_main_board.start()
+t_red.start()
+t_blue.start()
+t_yellow.start()
+
+t_display_feed.join()
+t_main_board.join()
+t_red.join()
+t_blue.join()
+t_yellow.join()
 
 
 #------------------MAIN------------------#
+print('Starting the while loop...')
 counter = 0
 
 while vc.isOpened():
@@ -248,7 +262,6 @@ while vc.isOpened():
     counter += 1
     
     if board_counter == 0:
-        cv2.imshow("Frame", frame) # NEED TO FIX THIS SHOWING FRAME ISSUE -- IT MIGHT BE BECAUSE IT'S NOT IN THE WHILE LOOP
         main_board(board_counter)
 
     print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
