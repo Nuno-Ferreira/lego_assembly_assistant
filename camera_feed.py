@@ -9,6 +9,8 @@ print("Starting program...")
 #--------------------------------- VARIABLES ---------------------------#
 url = "http://192.168.1.65:8080/video" # USING THE PHONE AS A WEBCAM
 vc = cv2.VideoCapture(1)
+ret, frame = vc.read()
+imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
 # SETTING UP THE KERNEL
 kernel = np.ones((10, 10), np.uint8)
@@ -272,20 +274,20 @@ print('Starting the threads...')
 
 #------------------THREADING------------------#
 t_display_feed = threading.Thread(target=display_feed)
+t_display_feed.start()
 t_main_board = threading.Thread(target=main_board)
+t_main_board.start()
 t_get_main_board = threading.Thread(target=get_main_board, args=(imghsv, frame, kernel, lower_green, upper_green))
+t_get_main_board.start()
+t_draw_contours = threading.Thread(target=draw_contours)
+t_draw_contours.start()
+t_main_board.join()
 t_user_interface = threading.Thread(target=user_interface)
 t_display_info = threading.Thread(target=display_info)
-t_draw_contours = threading.Thread(target=draw_contours)
 t_red = threading.Thread(target=red_detection, args=(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio))
 t_blue = threading.Thread(target=blue_detection, args=(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio))
 t_yellow = threading.Thread(target=yellow_detection, args=(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio))
 
-t_display_feed.start()
-t_get_main_board.start()
-t_draw_contours.start()
-t_main_board.start()
-t_main_board.join()
 t_user_interface.start()
 t_user_interface.join()
 
