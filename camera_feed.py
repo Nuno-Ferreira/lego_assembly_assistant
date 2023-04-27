@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import threading
+import queue
 
 
 print("Starting program...")
@@ -41,6 +42,8 @@ blue_width_studs = 0
 blue_height_studs = 0
 yellow_width_studs = 0
 yellow_height_studs = 0
+
+contours_queue = queue.Queue()
 
 #--------------------------------- FUNCTIONS ---------------------------#
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE TO THE NEXT STEP
@@ -87,7 +90,8 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
                 height_ratio = h / 8
                 width_ratio = w / 16
 
-                green_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
+                board_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
+                contours_queue.put(board_output)
 
 
 
@@ -117,6 +121,7 @@ def green_detection(imghsv, img, kernel, lower_green, upper_green, width_ratio, 
 
             if h and w > 50:
                 green_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
+                #contours_queue.put(green_output)
 
 
 
@@ -148,6 +153,7 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
             if h and w > 50:
                 red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
+                contours_queue.put(red_output)
 
 
 
@@ -177,6 +183,7 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
             if h and w > 50:
                 blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
+                contours_queue.put(blue_output)
 
 
 
@@ -207,6 +214,7 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 
             if h and w > 50:
                 yellow_output = cv2.drawContours(img, c, -1, (0, 255, 255), 4)
+                contours_queue.put(yellow_output)
 
 
 
@@ -231,6 +239,10 @@ def display_feed():
     while vc.isOpened():
         ret, frame = vc.read()
         imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        board_output, red_output, blue_output, yellow_output = queue.get()
+
+        cv2.imshow("Board", board_output)
 
         cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 27:
