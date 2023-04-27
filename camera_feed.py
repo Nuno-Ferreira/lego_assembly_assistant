@@ -40,6 +40,7 @@ def main_board(board_counter):
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     print('Make sure that the whole main board is selected in the image and then press Enter to continue')
     input()
+    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     board_counter += 1
 
 
@@ -199,7 +200,7 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 
 
 def user_interface():
-    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
+    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
     input()
 
 
@@ -211,13 +212,14 @@ def display_feed():
         ret, frame = vc.read()
         imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-        counter += 1
+        # NEED TO PUT THIS IN A SEPARATE FUNCTION
+        # counter += 1
 
-        if counter == 100:
-            print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-            print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
-            print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
-            counter = 0
+        # if counter == 100:
+        #     print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+        #     print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+        #     print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
+        #     counter = 0
 
         cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 27:
@@ -230,20 +232,26 @@ print('Starting the threads...')
 
 #------------------THREADING------------------#
 t_display_feed = threading.Thread(target=display_feed)
+t_display_feed.start()
 t_main_board = threading.Thread(target=main_board, args=(board_counter,))
+t_main_board.start()
+t_main_board.join()
+t_user_interface = threading.Thread(target=user_interface)
 t_red = threading.Thread(target=red_detection, args=(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio))
 t_blue = threading.Thread(target=blue_detection, args=(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio))
 t_yellow = threading.Thread(target=yellow_detection, args=(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio))
 
-
-t_display_feed.start()
-t_main_board.start()
+# NEED TO COMBINE THE START AND FINISH OF THE THREADS TO MAKE SURE IT GOES IN THE RIGHT ORDER
+# t_display_feed.start()
+# t_main_board.start()
+t_user_interface.start()
 t_red.start()
 t_blue.start()
 t_yellow.start()
 
 t_display_feed.join()
-t_main_board.join()
+# t_main_board.join()
+t_user_interface.join()
 t_red.join()
 t_blue.join()
 t_yellow.join()
