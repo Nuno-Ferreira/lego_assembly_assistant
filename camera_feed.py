@@ -44,7 +44,7 @@ yellow_width_studs = 0
 yellow_height_studs = 0
 
 contours_queue = queue.Queue()
-
+c_queue_lock = threading.Lock()
 #--------------------------------- FUNCTIONS ---------------------------#
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE TO THE NEXT STEP
 # board_counter = 0
@@ -91,7 +91,8 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
                 width_ratio = w / 16
 
                 board_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
-                contours_queue.put(board_output)
+                with c_queue_lock:
+                    contours_queue.put(img, c)
 
 
 
@@ -153,7 +154,8 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
             if h and w > 50:
                 red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
-                contours_queue.put(red_output)
+                with c_queue_lock:
+                    contours_queue.put(img, c)
 
 
 
@@ -183,7 +185,8 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
             if h and w > 50:
                 blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
-                contours_queue.put(blue_output)
+                with c_queue_lock:
+                    contours_queue.put(img, c)
 
 
 
@@ -214,7 +217,8 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 
             if h and w > 50:
                 yellow_output = cv2.drawContours(img, c, -1, (0, 255, 255), 4)
-                contours_queue.put(yellow_output)
+                with c_queue_lock:
+                    contours_queue.put(img, c)
 
 
 
@@ -239,16 +243,28 @@ def display_feed():
     while vc.isOpened():
         ret, frame = vc.read()
         imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-        board_output, red_output, blue_output, yellow_output = queue.get()
-
-        cv2.imshow("Board", board_output)
-
-        cv2.imshow("Frame", frame)
+        cv2.imshow("Frame", frame) # NEED TO SORT OUT THE QUEUE SO THAT THIS CAN LOOP AND SHOW THE FRAME
+        # with c_queue_lock:
+        #     if not contours_queue.empty():
+        #         img, c = contours_queue.get()
+        # cv2.drawContours(img, c, -1, (0, 255, 0), 4)
+        # cv2.imshow("Contours Queue", img)
+        # board_output, red_output, blue_output, yellow_output = contours_queue.get()
+        #cv2.imshow("Board", board_output)
+        # cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 27:
             break
     cv2.destroyAllWindows()
     vc.release()
+
+
+
+def draw_contours():
+    with c_queue_lock:
+        if not contours_queue.empty():
+            img, c = contours_queue.get()
+    cv2.drawContours(img, c, -1, (0, 255, 0), 4)
+    cv2.imshow("Contours Queue", img)
 
 
 print('Starting the threads...')
@@ -300,7 +316,7 @@ while vc.isOpened():
     # if board_counter == 0:
     #     main_board(board_counter)
 
-    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \n Press Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
+    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
     input()
 
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
