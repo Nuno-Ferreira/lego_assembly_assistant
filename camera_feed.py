@@ -286,23 +286,23 @@ while vc.isOpened():
             print('Place the main green board in the center of the camera feed and press Enter to continue')
             board_first_iteration = False
         else:
-            if cv2.waitKey(100) == 13: #THIS IS NOT WORKING SO NEED TO FIX IT
+            if cv2.waitKey(1) == 13: #THIS IS NOT WORKING SO NEED TO FIX IT
                 break
             get_main_board(imghsv, frame, kernel, lower_green, upper_green)
-            # print('Make sure that the whole main board is selected in the image and then press Enter to continue') # MAYBE DELETE THIS AS IT CAN BE REDUNDANT
-            # input()
             cv2.imshow("Frame", frame)
-            continue # NEED TO USE THIS SO THAT IT GOES BACK UP TO THE TOP OF THE WHILE LOOP AND DOESN'T CONTINUE WITH THE REST OF THE CODE
-        board_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
+        continue # NEED TO USE THIS SO THAT IT GOES BACK UP TO THE TOP OF THE WHILE LOOP AND DOESN'T CONTINUE WITH THE REST OF THE CODE
+    board_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
 
     if ui_counter == 0:
-        print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
+        if ui_first_iteration:
+            print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.')
+            ui_first_iteration = False
         if cv2.waitKey(1) == 13:
             break
-        continue#REPLACE THIS WITH WAITKEY AND ADD A CONTINUE STATEMENT TO THE IF STATEMENT 
+        continue
     ui_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
 
-    # ADD A COUNTER TO THIS SO THAT AFTER A CERTAIN AMOUNT OF TIME IT STARTS DETECTING THE PIECES
+    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
@@ -312,7 +312,7 @@ while vc.isOpened():
     # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
 
     if counter == 100:
-        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}') # NEED TO FIX THIS SO THAT IT PRINTS THE VALUES OF ALL THE PIECES DETECTED AND NOT JUST ONE PIECE OF EACH COLOUR
         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
         counter = 0
