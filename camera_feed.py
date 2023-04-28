@@ -282,15 +282,18 @@ while vc.isOpened():
     counter += 1
     
     if board_counter == 0:
-        print('Place the main green board in the center of the camera feed and press Enter to continue') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN ADD SOMETHING LIKE IF BOARD_COUNTER == 100
-        if cv2.waitKey(100) == 13: #THIS IS NOT WORKING SO NEED TO FIX IT
-            break
-        get_main_board(imghsv, frame, kernel, lower_green, upper_green)
-        # print('Make sure that the whole main board is selected in the image and then press Enter to continue') # MAYBE DELETE THIS AS IT CAN BE REDUNDANT
-        # input()
-        cv2.imshow("Frame", frame)
-        continue # NEED TO USE THIS SO THAT IT GOES BACK UP TO THE TOP OF THE WHILE LOOP AND DOESN'T CONTINUE WITH THE REST OF THE CODE
-    board_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
+        if board_first_iteration:
+            print('Place the main green board in the center of the camera feed and press Enter to continue')
+            board_first_iteration = False
+        else:
+            if cv2.waitKey(100) == 13: #THIS IS NOT WORKING SO NEED TO FIX IT
+                break
+            get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+            # print('Make sure that the whole main board is selected in the image and then press Enter to continue') # MAYBE DELETE THIS AS IT CAN BE REDUNDANT
+            # input()
+            cv2.imshow("Frame", frame)
+            continue # NEED TO USE THIS SO THAT IT GOES BACK UP TO THE TOP OF THE WHILE LOOP AND DOESN'T CONTINUE WITH THE REST OF THE CODE
+        board_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
 
     if ui_counter == 0:
         print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
