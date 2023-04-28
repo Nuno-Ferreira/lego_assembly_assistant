@@ -49,15 +49,15 @@ contours_queue = queue.Queue()
 c_queue_lock = threading.Lock()
 #--------------------------------- FUNCTIONS ---------------------------#
 # TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE TO THE NEXT STEP
-# board_counter = 0
-def main_board():
+
+def main_board(board_counter):
     print('Place the main green board in the center of the camera feed and press Enter to continue')
     input()
-    # get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     print('Make sure that the whole main board is selected in the image and then press Enter to continue')
     input()
-    # get_main_board(imghsv, frame, kernel, lower_green, upper_green)
-    # board_counter += 1
+    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+    board_counter += 1
 
 
 # GET THE MAIN BOARD
@@ -270,6 +270,62 @@ def draw_contours():
         cv2.imshow("Contours Queue", img)
 
 
+#------------------MAIN------------------#
+print('Starting the while loop...')
+counter = 0
+board_counter = 0
+ui_counter = 0
+
+while vc.isOpened():
+    # READ THE FRAME AND CONVERT IT TO HSV
+    ret, frame = vc.read()
+    imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # SET THE COUNTER
+    counter += 1
+    
+    if board_counter == 0:
+        print('Place the main green board in the center of the camera feed and press Enter to continue')
+        if cv2.waitKey(1) == 13:
+            break
+        get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+        # print('Make sure that the whole main board is selected in the image and then press Enter to continue') # MAYBE DELETE THIS AS IT CAN BE REDUNDANT
+        # input()
+        cv2.imshow("Frame", frame)
+        continue # NEED TO USE THIS SO THAT IT GOES BACK UP TO THE TOP OF THE WHILE LOOP AND DOESN'T CONTINUE WITH THE REST OF THE CODE
+    board_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
+
+    if ui_counter == 0:
+        print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
+        if cv2.waitKey(1) == 13:
+            break
+        continue#REPLACE THIS WITH WAITKEY AND ADD A CONTINUE STATEMENT TO THE IF STATEMENT 
+    ui_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
+
+    # ADD A COUNTER TO THIS SO THAT AFTER A CERTAIN AMOUNT OF TIME IT STARTS DETECTING THE PIECES
+    red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
+    blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
+    yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
+
+    # SET UP A DICTIONARY TO STORE EACH LEGO PIECE AND ITS DIMENSIONS WITH THE COLOUR BEING THE KEY AND THE DIMENSIONS BEING THE VALUES
+    #lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]} # MAYBE USE THIS OR SOMETHING SIMILAR
+    # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
+
+    if counter == 100:
+        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
+        print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
+        print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
+        counter = 0
+
+    cv2.imshow("Frame", frame)
+    if cv2.waitKey(1) == 27:
+        break
+cv2.destroyAllWindows()
+vc.release()
+
+
+
+
 print('Starting the threads...')
 
 #------------------THREADING------------------#
@@ -303,42 +359,3 @@ t_display_info.join()
 t_get_main_board.join()
 t_display_feed.join()
 
-
-
-#------------------MAIN------------------#
-print('Starting the while loop...')
-counter = 0
-
-while vc.isOpened():
-    # READ THE FRAME AND CONVERT IT TO HSV
-    ret, frame = vc.read()
-    imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    # SET THE COUNTER
-    counter += 1
-    
-    # if board_counter == 0:
-    #     main_board(board_counter)
-
-    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
-    input()
-
-    red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
-    blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
-    yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
-
-    # SET UP A DICTIONARY TO STORE EACH LEGO PIECE AND ITS DIMENSIONS WITH THE COLOUR BEING THE KEY AND THE DIMENSIONS BEING THE VALUES
-    #lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]} # MAYBE USE THIS OR SOMETHING SIMILAR
-    # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
-
-    if counter == 100:
-        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-        print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
-        print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
-        counter = 0
-
-    cv2.imshow("Frame", frame)
-    if cv2.waitKey(1) == 27:
-        break
-cv2.destroyAllWindows()
-vc.release()
