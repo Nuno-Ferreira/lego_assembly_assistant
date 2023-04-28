@@ -1,7 +1,5 @@
 import cv2
 import numpy as np
-import threading
-import queue
 
 
 print("Starting program...")
@@ -9,8 +7,6 @@ print("Starting program...")
 #--------------------------------- VARIABLES ---------------------------#
 url = "http://192.168.1.65:8080/video" # USING THE PHONE AS A WEBCAM
 vc = cv2.VideoCapture(1)
-# ret, frame = vc.read()
-# imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
 # SETTING UP THE KERNEL
 kernel = np.ones((10, 10), np.uint8)
@@ -33,32 +29,8 @@ upper_blue = np.array([160,255,255])
 lower_yellow = np.array([20,100,100])
 upper_yellow = np.array([50,255,255])
 
-# DECLARING THE HEIGHT AND WIDTH RATIOS SO THEY CAN BE USED IN THE OTHER FUNCTIONS
-# width_ratio = 0
-# height_ratio = 0
-# green_width_studs = 0
-# green_height_studs = 0
-# red_width_studs = 0
-# red_height_studs = 0
-# blue_width_studs = 0
-# blue_height_studs = 0
-# yellow_width_studs = 0
-# yellow_height_studs = 0
 
-contours_queue = queue.Queue()
-c_queue_lock = threading.Lock()
 #--------------------------------- FUNCTIONS ---------------------------#
-# TELL USER TO PLACE THE MAIN GREEN BOARD IN THE CENTER OF THE CAMERA FEED AND PRESS 'Q' TO CONTINUE TO THE NEXT STEP
-
-def main_board(board_counter):
-    print('Place the main green board in the center of the camera feed and press Enter to continue')
-    input()
-    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
-    print('Make sure that the whole main board is selected in the image and then press Enter to continue')
-    input()
-    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
-    board_counter += 1
-
 
 # GET THE MAIN BOARD
 def get_main_board(imghsv, img, kernel, lower_green, upper_green):
@@ -92,8 +64,6 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
             width_ratio = w / 16
 
             board_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
-            with c_queue_lock:
-                contours_queue.put(img, c)
 
 
 
@@ -122,7 +92,6 @@ def green_detection(imghsv, img, kernel, lower_green, upper_green, width_ratio, 
 
         if h and w > 50:
             green_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
-            #contours_queue.put(green_output)
 
 
 
@@ -153,8 +122,6 @@ def red_detection(imghsv, img, kernel, lower_red1, upper_red1, lower_red2, upper
 
         if h and w > 50:
             red_output = cv2.drawContours(img, c, -1, (0, 0, 255), 4)
-            with c_queue_lock:
-                contours_queue.put(img, c)
 
 
 
@@ -183,8 +150,6 @@ def blue_detection(imghsv, img, kernel, lower_blue, upper_blue, width_ratio, hei
 
         if h and w > 50:
             blue_output = cv2.drawContours(img, c, -1, (255, 0, 0), 4)
-            with c_queue_lock:
-                contours_queue.put(img, c)
 
 
 
@@ -214,58 +179,10 @@ def yellow_detection(imghsv, img, kernel, lower_yellow, upper_yellow, width_rati
 
         if h and w > 50:
             yellow_output = cv2.drawContours(img, c, -1, (0, 255, 255), 4)
-            with c_queue_lock:
-                contours_queue.put(img, c)
-
-
-
-def user_interface():
-    print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.') # NEED TO MAKE SURE THIS DOESN'T PRINT OVER AND OVER AGAIN
-    input()
-
-
-def display_info():
-    counter = 0
-    while vc.isOpened():
-        counter += 0.5
-        if counter == 1000000:
-            print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-            print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
-            print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
-            counter = 0
-
-
-def display_feed():
-    global frame, imghsv
-    while vc.isOpened():
-        ret, frame = vc.read()
-        imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        cv2.imshow("Frame", frame) # NEED TO SORT OUT THE QUEUE SO THAT THIS CAN LOOP AND SHOW THE FRAME
-        # with c_queue_lock:
-        #     if not contours_queue.empty():
-        #         img, c = contours_queue.get()
-        # cv2.drawContours(img, c, -1, (0, 255, 0), 4)
-        # cv2.imshow("Contours Queue", img)
-        # board_output, red_output, blue_output, yellow_output = contours_queue.get()
-        #cv2.imshow("Board", board_output)
-        # cv2.imshow("Frame", frame)
-        if cv2.waitKey(1) == 27:
-            break
-    cv2.destroyAllWindows()
-    vc.release()
-
-
-
-def draw_contours():
-    while vc.isOpened():
-        with c_queue_lock:
-            if not contours_queue.empty():
-                img, c = contours_queue.get()
-        cv2.drawContours(img, c, -1, (0, 255, 0), 4)
-        cv2.imshow("Contours Queue", img)
 
 
 #------------------MAIN------------------#
+
 print('Starting the while loop...')
 counter = 0
 board_counter = 0
@@ -287,20 +204,18 @@ while vc.isOpened():
             board_first_iteration = False
         else:
             if cv2.waitKey(1) == 13: #THIS IS NOT WORKING SO NEED TO FIX IT
-                break
+                board_counter += 1
             get_main_board(imghsv, frame, kernel, lower_green, upper_green)
             cv2.imshow("Frame", frame)
         continue # NEED TO USE THIS SO THAT IT GOES BACK UP TO THE TOP OF THE WHILE LOOP AND DOESN'T CONTINUE WITH THE REST OF THE CODE
-    board_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
 
     if ui_counter == 0:
         if ui_first_iteration:
             print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.')
             ui_first_iteration = False
         if cv2.waitKey(1) == 13:
-            break
+            ui_counter += 1
         continue
-    ui_counter += 1 # NEED TO MAKE SURE THAT THIS DOESN'T KEEP INCREASING
 
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
@@ -311,7 +226,7 @@ while vc.isOpened():
     #lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]} # MAYBE USE THIS OR SOMETHING SIMILAR
     # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
 
-    if counter == 100:
+    if counter >= 100: # NEED TO FIX THIS
         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}') # NEED TO FIX THIS SO THAT IT PRINTS THE VALUES OF ALL THE PIECES DETECTED AND NOT JUST ONE PIECE OF EACH COLOUR
         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
@@ -322,40 +237,3 @@ while vc.isOpened():
         break
 cv2.destroyAllWindows()
 vc.release()
-
-
-
-
-print('Starting the threads...')
-
-#------------------THREADING------------------#
-t_display_feed = threading.Thread(target=display_feed)
-t_display_feed.start()
-t_main_board = threading.Thread(target=main_board)
-t_main_board.start()
-t_get_main_board = threading.Thread(target=get_main_board, args=(imghsv, frame, kernel, lower_green, upper_green))
-t_get_main_board.start()
-t_draw_contours = threading.Thread(target=draw_contours)
-t_draw_contours.start()
-t_main_board.join()
-t_user_interface = threading.Thread(target=user_interface)
-t_display_info = threading.Thread(target=display_info)
-t_red = threading.Thread(target=red_detection, args=(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio))
-t_blue = threading.Thread(target=blue_detection, args=(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio))
-t_yellow = threading.Thread(target=yellow_detection, args=(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio))
-
-t_user_interface.start()
-t_user_interface.join()
-
-t_red.start()
-t_blue.start()
-t_yellow.start()
-t_display_info.start()
-
-t_red.join()
-t_blue.join()
-t_yellow.join()
-t_display_info.join()
-t_get_main_board.join()
-t_display_feed.join()
-
