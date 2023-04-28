@@ -213,11 +213,16 @@ while vc.isOpened():
         if ui_first_iteration:
             print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.')
             ui_first_iteration = False
+        green_detection(imghsv, frame, kernel, lower_green, upper_green, width_ratio, height_ratio)
+        red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
+        blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
+        yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
         if cv2.waitKey(1) == 13:
             ui_counter += 1
         continue
 
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+    green_detection(imghsv, frame, kernel, lower_green, upper_green, width_ratio, height_ratio)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
