@@ -239,14 +239,14 @@ while vc.isOpened():
         random_piece = rand.choice(list(lego_pieces.keys()))
 
         # RANDOM LOCATION ON THE BOARD
-        x = rand.randint(1, 8)
-        y = rand.randint(1, 16)
-        print(f'Place the {random_piece} piece at {x}, {y} and press Enter to continue')
+        h = rand.randint(1, 8)
+        w = rand.randint(1, 16)
+        print(f'Place the {random_piece} piece at {h}, {w} and press Enter to continue')
         if cv2.waitKey(1) == 13:
             pass
-        
+
         # DRAW THE PIECE ON THE BOARD
-        cv2.rectangle(frame, (x, y), (x + lego_pieces[random_piece][1], y + lego_pieces[random_piece][0]), (0, 255, 0), 2)
+        cv2.rectangle(frame, (h, w), (h + lego_pieces[random_piece][0], w + lego_pieces[random_piece][1]), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
 
         # REMOVE THE PIECE FROM THE DICTIONARY
         lego_pieces.pop(random_piece)
