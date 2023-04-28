@@ -189,6 +189,7 @@ board_counter = 0
 ui_counter = 0
 board_first_iteration = True
 ui_first_iteration = True
+dict_first_iteration = True
 
 while vc.isOpened():
     # READ THE FRAME AND CONVERT IT TO HSV
@@ -203,11 +204,11 @@ while vc.isOpened():
             print('Place the main green board in the center of the camera feed and press Enter to continue')
             board_first_iteration = False
         else:
-            if cv2.waitKey(1) == 13: #THIS IS NOT WORKING SO NEED TO FIX IT
+            if cv2.waitKey(1) == 13:
                 board_counter += 1
             get_main_board(imghsv, frame, kernel, lower_green, upper_green)
             cv2.imshow("Frame", frame)
-        continue # NEED TO USE THIS SO THAT IT GOES BACK UP TO THE TOP OF THE WHILE LOOP AND DOESN'T CONTINUE WITH THE REST OF THE CODE
+        continue
 
     if ui_counter == 0:
         if ui_first_iteration:
@@ -217,6 +218,7 @@ while vc.isOpened():
         red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
         blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
         yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
+        cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 13:
             ui_counter += 1
         continue
@@ -227,15 +229,22 @@ while vc.isOpened():
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
 
-    # SET UP A DICTIONARY TO STORE EACH LEGO PIECE AND ITS DIMENSIONS WITH THE COLOUR BEING THE KEY AND THE DIMENSIONS BEING THE VALUES
-    #lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]} # MAYBE USE THIS OR SOMETHING SIMILAR
-    # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
+    if dict_first_iteration:
+        print('The pieces have been detected. If there are any wrong values press Enter to retake them.')
+        # SET UP A DICTIONARY TO STORE EACH LEGO PIECE AND ITS DIMENSIONS WITH THE COLOUR BEING THE KEY AND THE DIMENSIONS BEING THE VALUES
+        lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]} # MAYBE USE THIS OR SOMETHING SIMILAR
+        dict_first_iteration = False
+        # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
 
     if counter >= 100: # NEED TO FIX THIS
         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}') # NEED TO FIX THIS SO THAT IT PRINTS THE VALUES OF ALL THE PIECES DETECTED AND NOT JUST ONE PIECE OF EACH COLOUR
+        print(f'GREEN: {int(green_height_studs)}x{int(green_width_studs)}')
         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
         counter = 0
+
+    if cv2.waitKey(1) == 13:
+        dict_first_iteration = True
 
     cv2.imshow("Frame", frame)
     if cv2.waitKey(1) == 27:
