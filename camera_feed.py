@@ -231,25 +231,34 @@ while vc.isOpened():
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
 
     if dict_first_iteration:
-        print('The pieces have been detected. If there are any wrong values press Enter to retake them.')
-        # SET UP A DICTIONARY TO STORE EACH LEGO PIECE AND ITS DIMENSIONS WITH THE COLOUR BEING THE KEY AND THE DIMENSIONS BEING THE VALUES
-        lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]} # MAYBE USE THIS OR SOMETHING SIMILAR
+        print('The pieces have been detected. If there are any wrong values press Enter to retake them.') #NEED TO FIX THIS SINCE IT DOESN'T WORK BECAUSE ITS NOT INSIDE THE WHILE LOOP
+        lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]}
         dict_first_iteration = False
+
+    while len(lego_pieces) > 0:
         # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
         random_piece = rand.choice(list(lego_pieces.keys()))
 
         # RANDOM LOCATION ON THE BOARD
         h = rand.randint(1, 8)
         w = rand.randint(1, 16)
-        print(f'Place the {random_piece} piece at {h}, {w} and press Enter to continue')
-        if cv2.waitKey(1) == 13:
-            pass
+        
+        # CREATE A RECTANGLE WITH THE MAIN BOARD DIMENSIONS AND THEN SUBTRACT THE PIECE DIMENSIONS
+        # USE THE VALUES OF THE PIECE TO SUBTRACT FROM THE MAIN BOARD DIMENSIONS
+        # MAYBE USE A NUMPY ARRAY 8x16 AND FILL IT WITH ZEROS AND THEN DEPENDING ON THE RANDOM LOCATION AND THE PIECE DIMENSIONS FILL IT WITH ONES
+        # THEN ADJUST THE RANDOM LOCATION SO THAT IT DOESN'T GO OUTSIDE THE MAIN BOARD DIMENSIONS
 
+         
         # DRAW THE PIECE ON THE BOARD
         cv2.rectangle(frame, (h, w), (h + lego_pieces[random_piece][0], w + lego_pieces[random_piece][1]), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
 
         # REMOVE THE PIECE FROM THE DICTIONARY
         lego_pieces.pop(random_piece)
+
+        print(f'Place the {random_piece} piece at {h}, {w} and press Enter to continue') # NEED TO FIGURE THIS OUT AND MAKE SURE IT'S ONLY PRINTING ONCE EVERY PIECE IS DRAWN
+        cv2.imshow("Frame", frame)
+        if cv2.waitKey(1) == 27:
+            break
 
 
     if counter >= 100:
