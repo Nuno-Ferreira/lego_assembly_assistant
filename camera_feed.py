@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import random as rand
 
 
 print("Starting program...")
@@ -235,8 +236,23 @@ while vc.isOpened():
         lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]} # MAYBE USE THIS OR SOMETHING SIMILAR
         dict_first_iteration = False
         # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
+        random_piece = rand.choice(list(lego_pieces.keys()))
 
-    if counter >= 100: # NEED TO FIX THIS
+        # RANDOM LOCATION ON THE BOARD
+        x = rand.randint(1, 8)
+        y = rand.randint(1, 16)
+        print(f'Place the {random_piece} piece at {x}, {y} and press Enter to continue')
+        if cv2.waitKey(1) == 13:
+            pass
+        
+        # DRAW THE PIECE ON THE BOARD
+        cv2.rectangle(frame, (x, y), (x + lego_pieces[random_piece][1], y + lego_pieces[random_piece][0]), (0, 255, 0), 2)
+
+        # REMOVE THE PIECE FROM THE DICTIONARY
+        lego_pieces.pop(random_piece)
+
+
+    if counter >= 100:
         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}') # NEED TO FIX THIS SO THAT IT PRINTS THE VALUES OF ALL THE PIECES DETECTED AND NOT JUST ONE PIECE OF EACH COLOUR
         print(f'GREEN: {int(green_height_studs)}x{int(green_width_studs)}')
         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
