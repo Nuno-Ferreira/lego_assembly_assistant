@@ -253,31 +253,38 @@ while vc.isOpened():
         main_board = np.zeros((8, 16), dtype=int)
         dict_first_iteration = False
 
+    next_piece = True
 
     while len(lego_pieces) > 0:
         # MAYBE MAKE A VARIABLE FALSE AT THE BEGINNING OF THE WHILE LOOP AND THEN MAKE IT TRUE WHEN THE PIECE IS PLACED ON THE BOARD (PRESSING ENTER)
-        print('inside the nested while loop')
-        random_piece = rand.choice(list(lego_pieces.keys()))
+        if next_piece:
+            print('inside the nested while loop') # THIS IS JUST FOR DEBUG PURPOSES -- DELETE THIS LATER
+            random_piece = rand.choice(list(lego_pieces.keys()))
 
-        piece_height, piece_width = lego_pieces[random_piece]
-        random_row = np.random.randint(0, main_board_height - piece_height + 1)
-        random_column = np.random.randint(0, main_board_width - piece_width + 1)
+            piece_height, piece_width = lego_pieces[random_piece]
+            random_row = np.random.randint(0, main_board_height - piece_height + 1)
+            random_column = np.random.randint(0, main_board_width - piece_width + 1)
 
-        if random_row + piece_height > main_board_height:
-            random_row = main_board_height - piece_height
-        if random_column + piece_width > main_board_width:
-            random_column = main_board_width - piece_width
+            if random_row + piece_height > main_board_height:
+                random_row = main_board_height - piece_height
+            if random_column + piece_width > main_board_width:
+                random_column = main_board_width - piece_width
 
-        main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 1
-        
-        # CHECK IF THE PIECE FITS ON THE BOARD
-        if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == piece_height * piece_width:
-            print('The piece fits on the board')
-            # DRAW THE PIECE ON THE BOARD
-            cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
-            print(f'Place the {random_piece} piece at {random_row}, {random_column} and press Enter to continue') # NEED TO FIGURE THIS OUT AND MAKE SURE IT'S ONLY PRINTING ONCE EVERY PIECE IS DRAWN
-            lego_pieces.pop(random_piece)
+            main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 1 # MAYBE PUT THIS INSIDE THE NEXT IF STATEMENT
+            
+            if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == piece_height * piece_width: 
+                print('The piece fits on the board')
+                cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
+                cv2.putText(frame, random_piece, (random_column, random_row), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                print(f'Place the {random_piece} piece at {random_row}, {random_column} and press Enter to continue') # NEED TO FIGURE THIS OUT AND MAKE SURE IT'S ONLY PRINTING ONCE EVERY PIECE IS DRAWN
+                lego_pieces.pop(random_piece)
+            else:
+                print('The piece does not fit on the board')
+                main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 0
+                continue # MAYBE REMOVE THIS
 
+            next_piece = False
+            # NEED TO MAKE SURE THAT THE TEXT AND THE DRAWN RECTANGLE IS OUTSIDE THE IF STATEMENT SO THAT IT'S DRAWN EVERY TIME THE WHILE LOOP RUNS
         cv2.imshow("Frame", frame)
         if cv2.waitKey(1) == 27:
             break
