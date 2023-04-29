@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import random as rand
+import numpy as np
 
 
 print("Starting program...")
@@ -190,7 +191,7 @@ board_counter = 0
 ui_counter = 0
 board_first_iteration = True
 ui_first_iteration = True
-dict_first_iteration = True
+dict_first_iteration = False
 
 while vc.isOpened():
     # READ THE FRAME AND CONVERT IT TO HSV
@@ -229,37 +230,7 @@ while vc.isOpened():
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
-
-    if dict_first_iteration:
-        print('The pieces have been detected. If there are any wrong values press Enter to retake them.') #NEED TO FIX THIS SINCE IT DOESN'T WORK BECAUSE ITS NOT INSIDE THE WHILE LOOP
-        lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]}
-        dict_first_iteration = False
-
-    while len(lego_pieces) > 0:
-        # THEN BY USING RANDOM INTEGERS DRAW ONE OF THE PIECES TO PLACE ON THE MAIN BOARD BY USING IT LIKE COORDINATES AND THEN REMOVE IT FROM THE DICTIONARY
-        random_piece = rand.choice(list(lego_pieces.keys()))
-
-        # RANDOM LOCATION ON THE BOARD
-        h = rand.randint(1, 8)
-        w = rand.randint(1, 16)
-        
-        # CREATE A RECTANGLE WITH THE MAIN BOARD DIMENSIONS AND THEN SUBTRACT THE PIECE DIMENSIONS
-        # USE THE VALUES OF THE PIECE TO SUBTRACT FROM THE MAIN BOARD DIMENSIONS
-        # MAYBE USE A NUMPY ARRAY 8x16 AND FILL IT WITH ZEROS AND THEN DEPENDING ON THE RANDOM LOCATION AND THE PIECE DIMENSIONS FILL IT WITH ONES
-        # THEN ADJUST THE RANDOM LOCATION SO THAT IT DOESN'T GO OUTSIDE THE MAIN BOARD DIMENSIONS
-
-         
-        # DRAW THE PIECE ON THE BOARD
-        cv2.rectangle(frame, (h, w), (h + lego_pieces[random_piece][0], w + lego_pieces[random_piece][1]), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
-
-        # REMOVE THE PIECE FROM THE DICTIONARY
-        lego_pieces.pop(random_piece)
-
-        print(f'Place the {random_piece} piece at {h}, {w} and press Enter to continue') # NEED TO FIGURE THIS OUT AND MAKE SURE IT'S ONLY PRINTING ONCE EVERY PIECE IS DRAWN
-        cv2.imshow("Frame", frame)
-        if cv2.waitKey(1) == 27:
-            break
-
+    
 
     if counter >= 100:
         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}') # NEED TO FIX THIS SO THAT IT PRINTS THE VALUES OF ALL THE PIECES DETECTED AND NOT JUST ONE PIECE OF EACH COLOUR
@@ -268,10 +239,55 @@ while vc.isOpened():
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
         counter = 0
 
+    if ui_counter == 1:
+        print('Press Enter for the program to place the pieces on the board.')
+        ui_counter += 1
     if cv2.waitKey(1) == 13:
         dict_first_iteration = True
 
+    if dict_first_iteration:
+        print('The pieces have been detected. If there are any wrong values press Enter to retake them.') #NEED TO FIX THIS SINCE IT DOESN'T WORK BECAUSE ITS NOT INSIDE THE WHILE LOOP
+        lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]}
+        dict_first_iteration = False
+
+        main_board_height = 8
+        main_board_width = 16
+        main_board = np.zeros((8, 16), dtype=int)
+
+    while len(lego_pieces) > 0:
+        # MAYBE MAKE A VARIABLE FALSE AT THE BEGINNING OF THE WHILE LOOP AND THEN MAKE IT TRUE WHEN THE PIECE IS PLACED ON THE BOARD (PRESSING ENTER)
+        print('inside the nested while loop')
+        random_piece = rand.choice(list(lego_pieces.keys()))
+
+        piece_height, piece_width = lego_pieces[random_piece]
+        random_row = np.random.randint(0, main_board_height - piece_height + 1)
+        random_column = np.random.randint(0, main_board_width - piece_width + 1)
+
+        if random_row + piece_height > main_board_height:
+            random_row = main_board_height - piece_height
+        if random_column + piece_width > main_board_width:
+            random_column = main_board_width - piece_width
+
+        main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 1
+        
+        # CHECK IF THE PIECE FITS ON THE BOARD
+        if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == piece_height * piece_width:
+            print('The piece fits on the board')
+            # DRAW THE PIECE ON THE BOARD
+            cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
+            print(f'Place the {random_piece} piece at {random_row}, {random_column} and press Enter to continue') # NEED TO FIGURE THIS OUT AND MAKE SURE IT'S ONLY PRINTING ONCE EVERY PIECE IS DRAWN
+            lego_pieces.pop(random_piece)
+
+        cv2.imshow("Frame", frame)
+        if cv2.waitKey(1) == 27:
+            break
+
+    # RESET THE VALUES OF THE DICTIONARY
+    if cv2.waitKey(1) == 114: 
+        dict_first_iteration = True
+
     cv2.imshow("Frame", frame)
+    # FINISH THE PROGRAM
     if cv2.waitKey(1) == 27:
         break
 cv2.destroyAllWindows()
