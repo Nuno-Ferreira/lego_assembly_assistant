@@ -246,13 +246,13 @@ while vc.isOpened():
         dict_first_iteration = True
 
     if dict_first_iteration:
-        print('The pieces have been detected. If there are any wrong values press Enter to retake them.') #NEED TO FIX THIS SINCE IT DOESN'T WORK BECAUSE ITS NOT INSIDE THE WHILE LOOP
+        print('The pieces have been detected. If there are any wrong values press "r" to retake them.') #NEED TO FIX THIS SINCE IT DOESN'T WORK BECAUSE ITS NOT INSIDE THE WHILE LOOP
         lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]}
-        dict_first_iteration = False
-
         main_board_height = 8
         main_board_width = 16
         main_board = np.zeros((8, 16), dtype=int)
+        dict_first_iteration = False
+
 
     while len(lego_pieces) > 0:
         # MAYBE MAKE A VARIABLE FALSE AT THE BEGINNING OF THE WHILE LOOP AND THEN MAKE IT TRUE WHEN THE PIECE IS PLACED ON THE BOARD (PRESSING ENTER)
