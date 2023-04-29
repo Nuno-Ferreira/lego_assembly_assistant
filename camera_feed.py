@@ -194,13 +194,12 @@ ui_first_iteration = True
 dict_first_iteration = False
 
 while vc.isOpened():
-    # READ THE FRAME AND CONVERT IT TO HSV
     ret, frame = vc.read()
     imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # SET THE COUNTER
     counter += 1
     
+    # UI AND DETECTION OF THE MAIN BOARD
     if board_counter == 0:
         if board_first_iteration:
             print('Place the main green board in the center of the camera feed and press Enter to continue')
@@ -212,9 +211,10 @@ while vc.isOpened():
             cv2.imshow("Frame", frame)
         continue
 
+    # UI AND DETECTION OF THE PIECES
     if ui_counter == 0:
         if ui_first_iteration:
-            print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame. \nPress Enter to continue.')
+            print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame and press Enter to continue.')
             ui_first_iteration = False
         green_detection(imghsv, frame, kernel, lower_green, upper_green, width_ratio, height_ratio)
         red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
@@ -225,13 +225,14 @@ while vc.isOpened():
             ui_counter += 1
         continue
 
+    # DETECTION OF THE PIECES
     get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     green_detection(imghsv, frame, kernel, lower_green, upper_green, width_ratio, height_ratio)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
     yellow_detection(imghsv, frame, kernel, lower_yellow, upper_yellow, width_ratio, height_ratio)
     
-
+    # PRINTING THE SIZE OF THE PIECES
     if counter >= 100:
         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}') # NEED TO FIX THIS SO THAT IT PRINTS THE VALUES OF ALL THE PIECES DETECTED AND NOT JUST ONE PIECE OF EACH COLOUR
         print(f'GREEN: {int(green_height_studs)}x{int(green_width_studs)}')
@@ -239,43 +240,52 @@ while vc.isOpened():
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
         counter = 0
 
+    # UI FOR THE USER TO START THE NESTED WHILE LOOP TO PLACE THE PIECES ON THE BOARD
     if ui_counter == 1:
         print('Press Enter for the program to place the pieces on the board.')
         ui_counter += 1
     if cv2.waitKey(1) == 13:
         dict_first_iteration = True
 
+    # UI FOR THE USER TO RETAKE THE VALUES OF THE PIECES AND THE SET UP OF THE DICIONARY
     if dict_first_iteration:
-        print('The pieces have been detected. If there are any wrong values press "r" to retake them.') #NEED TO FIX THIS SINCE IT DOESN'T WORK BECAUSE ITS NOT INSIDE THE WHILE LOOP
+        print('The pieces have been detected. If there are any wrong values press "r" to retake them.') 
         lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]}
         main_board_height = 8
         main_board_width = 16
         main_board = np.zeros((8, 16), dtype=int)
         dict_first_iteration = False
 
+    # SETTING UP THE VARIABLE FOR THE NESTED WHILE LOOP
     next_piece = True
 
+    # NESTED WHILE LOOP TO PLACE THE PIECES ON THE BOARD
     while len(lego_pieces) > 0:
-        # MAYBE MAKE A VARIABLE FALSE AT THE BEGINNING OF THE WHILE LOOP AND THEN MAKE IT TRUE WHEN THE PIECE IS PLACED ON THE BOARD (PRESSING ENTER)
         if next_piece:
             print('inside the nested while loop') # THIS IS JUST FOR DEBUG PURPOSES -- DELETE THIS LATER
+
+            # CHOOSING A RANDOM PIECE FROM THE DICTIONARY
             random_piece = rand.choice(list(lego_pieces.keys()))
 
+            # GETTING A RANDOM LOCATION ON THE BOARD TO PLACE THE PIECE
             piece_height, piece_width = lego_pieces[random_piece]
             random_row = np.random.randint(0, main_board_height - piece_height + 1)
             random_column = np.random.randint(0, main_board_width - piece_width + 1)
 
+            # CHECKING IF THE PIECE FITS ON THE BOARD
             if random_row + piece_height > main_board_height:
                 random_row = main_board_height - piece_height
             if random_column + piece_width > main_board_width:
                 random_column = main_board_width - piece_width
 
+            # REPLACING THE VALUES OF THE PIECE ON THE BOARD WITH 1 TO INDICATE THAT THERE IS A PIECE THERE
             main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 1 # MAYBE PUT THIS INSIDE THE NEXT IF STATEMENT
             
+            # CHECKING IF THE PIECE FITS ON THE BOARD
             if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == piece_height * piece_width: 
                 print('The piece fits on the board')
                 cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
-                cv2.putText(frame, random_piece, (random_column, random_row), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(frame, random_piece, (random_column, random_row), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE TEXT AND THE DRAWN RECTANGLE IS ON THE MAIN BOARD ON THE FRAME
                 print(f'Place the {random_piece} piece at {random_row}, {random_column} and press Enter to continue') # NEED TO FIGURE THIS OUT AND MAKE SURE IT'S ONLY PRINTING ONCE EVERY PIECE IS DRAWN
                 lego_pieces.pop(random_piece)
             else:
@@ -283,11 +293,15 @@ while vc.isOpened():
                 main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 0
                 continue # MAYBE REMOVE THIS
 
+            # MAKING SURE THAT THE NESTED WHILE LOOP DOESN'T RUN AGAIN UNTIL THE USER CONFIRMS THAT THE PIECE IS PLACED CORRECTLY
             next_piece = False
             # NEED TO MAKE SURE THAT THE TEXT AND THE DRAWN RECTANGLE IS OUTSIDE THE IF STATEMENT SO THAT IT'S DRAWN EVERY TIME THE WHILE LOOP RUNS
+            
         cv2.imshow("Frame", frame)
-        if cv2.waitKey(1) == 27:
-            break
+        # MAKE IT GO TO THE NEXT PIECE
+        if cv2.waitKey(1) == 13:
+            next_piece = True
+            continue
 
     # RESET THE VALUES OF THE DICTIONARY
     if cv2.waitKey(1) == 114: 
