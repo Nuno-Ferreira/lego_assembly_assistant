@@ -192,6 +192,7 @@ ui_counter = 0
 board_first_iteration = True
 ui_first_iteration = True
 dict_first_iteration = False
+lego_pieces = {}
 
 while vc.isOpened():
     ret, frame = vc.read()
@@ -226,7 +227,6 @@ while vc.isOpened():
         continue
 
     # DETECTION OF THE PIECES
-    get_main_board(imghsv, frame, kernel, lower_green, upper_green)
     green_detection(imghsv, frame, kernel, lower_green, upper_green, width_ratio, height_ratio)
     red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
     blue_detection(imghsv, frame, kernel, lower_blue, upper_blue, width_ratio, height_ratio)
@@ -234,7 +234,7 @@ while vc.isOpened():
     
     # PRINTING THE SIZE OF THE PIECES
     if counter >= 100:
-        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}') # NEED TO FIX THIS SO THAT IT PRINTS THE VALUES OF ALL THE PIECES DETECTED AND NOT JUST ONE PIECE OF EACH COLOUR
+        print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
         print(f'GREEN: {int(green_height_studs)}x{int(green_width_studs)}')
         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
@@ -279,7 +279,7 @@ while vc.isOpened():
                 random_column = main_board_width - piece_width
 
             # REPLACING THE VALUES OF THE PIECE ON THE BOARD WITH 1 TO INDICATE THAT THERE IS A PIECE THERE
-            main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 1 # MAYBE PUT THIS INSIDE THE NEXT IF STATEMENT
+            main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 1
             
             # CHECKING IF THE PIECE FITS ON THE BOARD
             if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == piece_height * piece_width: 
