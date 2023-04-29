@@ -264,6 +264,7 @@ while vc.isOpened():
 
     # NESTED WHILE LOOP TO PLACE THE PIECES ON THE BOARD
     while len(lego_pieces) > 0:
+        ret, frame = vc.read()
         nested_loop = True
         if next_piece:
 
