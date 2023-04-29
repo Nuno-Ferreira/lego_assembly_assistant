@@ -38,7 +38,7 @@ upper_yellow = np.array([50,255,255])
 def get_main_board(imghsv, img, kernel, lower_green, upper_green):
     
     # DECLARING THE HEIGHT AND WIDTH RATIOS SO THEY CAN BE USED IN THE OTHER FUNCTIONS
-    global height_ratio, width_ratio
+    global height_ratio, width_ratio, x, y, w, h
     mask_green = cv2.inRange(imghsv, lower_green, upper_green)
     img_green_mask = cv2.bitwise_and(img, img, mask=mask_green)
     green_mask = cv2.dilate(img_green_mask, kernel, iterations=2)
@@ -266,8 +266,9 @@ while vc.isOpened():
     while len(lego_pieces) > 0:
         ret, frame = vc.read()
         nested_loop = True
+        get_main_board(imghsv, frame, kernel, lower_green, upper_green)
         if next_piece:
-
+            get_main_board(imghsv, frame, kernel, lower_green, upper_green)
             # CHOOSING A RANDOM PIECE FROM THE DICTIONARY
             random_piece = rand.choice(list(lego_pieces.keys()))
 
@@ -287,9 +288,9 @@ while vc.isOpened():
             
             # CHECKING IF THE PIECE FITS ON THE BOARD
             if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == piece_height * piece_width: 
-                cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
-                cv2.putText(frame, random_piece, (random_column, random_row), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE TEXT AND THE DRAWN RECTANGLE IS ON THE MAIN BOARD ON THE FRAME
-                print(f'Place the {random_piece} piece at {random_row}, {random_column} and press Enter to continue')
+                cv2.rectangle(frame, (x + random_column*width_ratio, y + random_row*height_ratio), (x + random_column*width_ratio + piece_width*width_ratio, y + random_row*height_ratio + piece_height*height_ratio), (0, 255, 0), 2)
+                cv2.putText(frame, random_piece, (x + random_column*width_ratio, y + random_row*height_ratio), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) 
+                print(f'Place the {random_piece} {piece_height}x{piece_width} piece at {random_row}, {random_column} and press Enter to continue')
             else:
                 main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 0
                 continue # NEED TO HAVE THIS HERE SO THAT IT KEEPS GOING THROUGH THE WHILE LOOP UNTIL IT FINDS A PLACE FOR THE PIECE
@@ -298,8 +299,8 @@ while vc.isOpened():
             next_piece = False
 
         # KEEP DRAWING THE RECTANGLE AND THE TEXT SO IT'S DRAWN EVERY FRAME
-        cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) 
-        cv2.putText(frame, random_piece, (random_column, random_row), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        cv2.rectangle(frame, (x + random_column*width_ratio, y + random_row*height_ratio), (x + random_column*width_ratio + piece_width*width_ratio, y + random_row*height_ratio + piece_height*height_ratio), (0, 255, 0), 2)
+        cv2.putText(frame, random_piece, (x + random_column*width_ratio, y + random_row*height_ratio), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         cv2.imshow("Frame", frame)
         # MAKE IT GO TO THE NEXT PIECE
