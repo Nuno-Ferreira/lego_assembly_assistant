@@ -250,7 +250,7 @@ while vc.isOpened():
     # UI FOR THE USER TO RETAKE THE VALUES OF THE PIECES AND THE SET UP OF THE DICIONARY
     if dict_first_iteration:
         print('The pieces have been detected. If there are any wrong values press "r" to retake them.') 
-        lego_pieces = {'red': [red_height_studs, red_width_studs], 'blue': [blue_height_studs, blue_width_studs], 'yellow': [yellow_height_studs, yellow_width_studs]}
+        lego_pieces = {'red': [int(red_height_studs), int(red_width_studs)], 'blue': [int(blue_height_studs), int(blue_width_studs)], 'yellow': [int(yellow_height_studs), int(yellow_width_studs)]}
         main_board_height = 8
         main_board_width = 16
         main_board = np.zeros((8, 16), dtype=int)
