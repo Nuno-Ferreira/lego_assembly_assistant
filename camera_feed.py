@@ -283,23 +283,24 @@ while vc.isOpened():
             
             # CHECKING IF THE PIECE FITS ON THE BOARD
             if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == piece_height * piece_width: 
-                print('The piece fits on the board')
                 cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE COORDINATES ARE NOT PIXELS BUT RATHER STUDS
                 cv2.putText(frame, random_piece, (random_column, random_row), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) # NEED TO MAKE SURE THAT THE TEXT AND THE DRAWN RECTANGLE IS ON THE MAIN BOARD ON THE FRAME
-                print(f'Place the {random_piece} piece at {random_row}, {random_column} and press Enter to continue') # NEED TO FIGURE THIS OUT AND MAKE SURE IT'S ONLY PRINTING ONCE EVERY PIECE IS DRAWN
-                lego_pieces.pop(random_piece)
+                print(f'Place the {random_piece} piece at {random_row}, {random_column} and press Enter to continue')
             else:
-                print('The piece does not fit on the board')
                 main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 0
-                continue # MAYBE REMOVE THIS
+                continue # NEED TO HAVE THIS HERE SO THAT IT KEEPS GOING THROUGH THE WHILE LOOP UNTIL IT FINDS A PLACE FOR THE PIECE
 
             # MAKING SURE THAT THE NESTED WHILE LOOP DOESN'T RUN AGAIN UNTIL THE USER CONFIRMS THAT THE PIECE IS PLACED CORRECTLY
             next_piece = False
-            # NEED TO MAKE SURE THAT THE TEXT AND THE DRAWN RECTANGLE IS OUTSIDE THE IF STATEMENT SO THAT IT'S DRAWN EVERY TIME THE WHILE LOOP RUNS
-            
+
+        # KEEP DRAWING THE RECTANGLE AND THE TEXT SO IT'S DRAWN EVERY FRAME
+        cv2.rectangle(frame, (random_column, random_row), (random_column + piece_width, random_row + piece_height), (0, 255, 0), 2) 
+        cv2.putText(frame, random_piece, (random_column, random_row), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
         cv2.imshow("Frame", frame)
         # MAKE IT GO TO THE NEXT PIECE
         if cv2.waitKey(1) == 13:
+            lego_pieces.pop(random_piece)
             next_piece = True
             continue
 
