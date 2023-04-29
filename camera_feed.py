@@ -203,7 +203,7 @@ while vc.isOpened():
     # UI AND DETECTION OF THE MAIN BOARD
     if board_counter == 0:
         if board_first_iteration:
-            print('Place the main green board in the center of the camera feed and press Enter to continue')
+            print('Place the Main Green Board in the center of the camera feed and press Enter to continue')
             board_first_iteration = False
         else:
             if cv2.waitKey(1) == 13:
@@ -215,7 +215,7 @@ while vc.isOpened():
     # UI AND DETECTION OF THE PIECES
     if ui_counter == 0:
         if ui_first_iteration:
-            print('Place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame and press Enter to continue.')
+            print('Remove the Main Board out of the feed and place all of the GREEN, RED, BLUE, and YELLOW pieces in the frame.\nPress Enter to continue.')
             ui_first_iteration = False
         green_detection(imghsv, frame, kernel, lower_green, upper_green, width_ratio, height_ratio)
         red_detection(imghsv, frame, kernel, lower_red1, upper_red1, lower_red2, upper_red2, width_ratio, height_ratio)
