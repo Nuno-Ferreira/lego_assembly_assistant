@@ -250,6 +250,7 @@ while vc.isOpened():
     # UI FOR THE USER TO RETAKE THE VALUES OF THE PIECES AND THE SET UP OF THE DICIONARY
     if dict_first_iteration:
         print('The pieces have been detected. If there are any wrong values press "r" to retake them.') 
+        # MAYBE ADD A FOR LOOP TO ADD THE CORRECT PIECES TO THE DICTIONARY
         lego_pieces = {'red': [int(red_height_studs), int(red_width_studs)], 'blue': [int(blue_height_studs), int(blue_width_studs)], 'yellow': [int(yellow_height_studs), int(yellow_width_studs)]}
         main_board_height = 8
         main_board_width = 16
@@ -258,11 +259,12 @@ while vc.isOpened():
 
     # SETTING UP THE VARIABLE FOR THE NESTED WHILE LOOP
     next_piece = True
+    all_pieces_placed = False
 
     # NESTED WHILE LOOP TO PLACE THE PIECES ON THE BOARD
     while len(lego_pieces) > 0:
+        nested_loop = True
         if next_piece:
-            print('inside the nested while loop') # THIS IS JUST FOR DEBUG PURPOSES -- DELETE THIS LATER
 
             # CHOOSING A RANDOM PIECE FROM THE DICTIONARY
             random_piece = rand.choice(list(lego_pieces.keys()))
@@ -303,6 +305,11 @@ while vc.isOpened():
             lego_pieces.pop(random_piece)
             next_piece = True
             continue
+
+    if nested_loop:
+        all_pieces_placed = True
+    if all_pieces_placed:
+        print('All the pieces have been placed on the board.')
 
     # RESET THE VALUES OF THE DICTIONARY
     if cv2.waitKey(1) == 114: 
