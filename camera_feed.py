@@ -260,6 +260,7 @@ while vc.isOpened():
     # SETTING UP THE VARIABLE FOR THE NESTED WHILE LOOP
     next_piece = True
     all_pieces_placed = False
+    nested_loop = False
 
     # NESTED WHILE LOOP TO PLACE THE PIECES ON THE BOARD
     while len(lego_pieces) > 0:
