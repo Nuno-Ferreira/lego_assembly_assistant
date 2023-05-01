@@ -237,7 +237,7 @@ while vc.isOpened():
     # PRINTING THE SIZE OF THE PIECES
     if counter >= 100:
         print(f'RED: {int(red_height_studs)}x{int(red_width_studs)}')
-        print(f'GREEN: {int(green_height_studs)}x{int(green_width_studs)}')
+        # print(f'GREEN: {int(green_height_studs)}x{int(green_width_studs)}')
         print(f'BLUE: {int(blue_height_studs)}x{int(blue_width_studs)}')
         print(f'YELLOW: {int(yellow_height_studs)}x{int(yellow_width_studs)}')
         counter = 0
@@ -263,11 +263,24 @@ while vc.isOpened():
     next_piece = True
     all_pieces_placed = False
     nested_loop = False
+    wait_main_board = True
+    nested_counter = 0
 
     # NESTED WHILE LOOP TO PLACE THE PIECES ON THE BOARD
     while len(lego_pieces) > 0:
         ret, frame = vc.read()
         nested_loop = True
+
+        # if next_piece == False :
+        #     if wait_main_board:
+        #         print('Place the Main Board back in the frame and press Space to continue.')
+        #         wait_main_board = False
+        #     # get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+        #     cv2.imshow("Frame", frame)
+        #     if cv2.waitKey(1) == 32:
+        #         next_piece = True
+        #     continue
+
         board_x, board_y = get_main_board(imghsv, frame, kernel, lower_green, upper_green)
         get_main_board(imghsv, frame, kernel, lower_green, upper_green)
         if next_piece:
@@ -300,6 +313,8 @@ while vc.isOpened():
 
             # MAKING SURE THAT THE NESTED WHILE LOOP DOESN'T RUN AGAIN UNTIL THE USER CONFIRMS THAT THE PIECE IS PLACED CORRECTLY
             next_piece = False
+
+        # board_x, board_y = get_main_board(imghsv, frame, kernel, lower_green, upper_green)
 
         # KEEP DRAWING THE RECTANGLE AND THE TEXT SO IT'S DRAWN EVERY FRAME
         cv2.rectangle(frame, (int(board_x + random_column*width_ratio), int(board_y + random_row*height_ratio)), (int(board_x + random_column*width_ratio + piece_width*width_ratio), int(board_y + random_row*height_ratio + piece_height*height_ratio)), (0, 255, 0), 2)
