@@ -269,17 +269,18 @@ while vc.isOpened():
     # NESTED WHILE LOOP TO PLACE THE PIECES ON THE BOARD
     while len(lego_pieces) > 0:
         ret, frame = vc.read()
+        imghsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         nested_loop = True
 
-        # if next_piece == False :
-        #     if wait_main_board:
-        #         print('Place the Main Board back in the frame and press Space to continue.')
-        #         wait_main_board = False
-        #     # get_main_board(imghsv, frame, kernel, lower_green, upper_green)
-        #     cv2.imshow("Frame", frame)
-        #     if cv2.waitKey(1) == 32:
-        #         next_piece = True
-        #     continue
+        if nested_counter == 0 :
+            if wait_main_board:
+                print('Place the Main Board back in the frame and press Space to continue.')
+                wait_main_board = False
+            get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+            cv2.imshow("Frame", frame)
+            if cv2.waitKey(1) == 32:
+                nested_counter += 1
+            continue
 
         board_x, board_y = get_main_board(imghsv, frame, kernel, lower_green, upper_green)
         get_main_board(imghsv, frame, kernel, lower_green, upper_green)
@@ -314,7 +315,7 @@ while vc.isOpened():
             # MAKING SURE THAT THE NESTED WHILE LOOP DOESN'T RUN AGAIN UNTIL THE USER CONFIRMS THAT THE PIECE IS PLACED CORRECTLY
             next_piece = False
 
-        # board_x, board_y = get_main_board(imghsv, frame, kernel, lower_green, upper_green)
+        board_x, board_y = get_main_board(imghsv, frame, kernel, lower_green, upper_green)
 
         # KEEP DRAWING THE RECTANGLE AND THE TEXT SO IT'S DRAWN EVERY FRAME
         cv2.rectangle(frame, (int(board_x + random_column*width_ratio), int(board_y + random_row*height_ratio)), (int(board_x + random_column*width_ratio + piece_width*width_ratio), int(board_y + random_row*height_ratio + piece_height*height_ratio)), (0, 255, 0), 2)
