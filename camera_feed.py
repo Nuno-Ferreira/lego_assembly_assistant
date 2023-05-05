@@ -66,7 +66,8 @@ def get_main_board(imghsv, img, kernel, lower_green, upper_green):
             width_ratio = w / 16
 
             board_output = cv2.drawContours(img, c, -1, (0, 255, 0), 4)
-
+        x = x - (w / 2)
+        y = y - (h / 2)
     return x, y
 
 
@@ -303,8 +304,8 @@ while vc.isOpened():
             if np.sum(main_board[random_row:random_row + piece_height, random_column:random_column + piece_width]) == 0: 
                 # REPLACING THE VALUES OF THE PIECE ON THE BOARD WITH 1 TO INDICATE THAT THERE IS A PIECE THERE
                 main_board[random_row:random_row + piece_height, random_column:random_column + piece_width] = 1
-                cv2.rectangle(frame, (int(board_x + random_column), int(board_y + random_row)), (int(board_x + random_column + piece_width), int(board_y + random_row + piece_height)), (0, 255, 0), 2)
-                cv2.putText(frame, random_piece, (int(board_x + random_column), int(board_y + random_row)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) 
+                cv2.rectangle(frame, (int(board_x + random_column*width_ratio), int(board_y + random_row*height_ratio)), (int(board_x + random_column*width_ratio + piece_width*width_ratio), int(board_y + random_row*height_ratio + piece_height*height_ratio)), (0, 255, 0), 2)
+                cv2.putText(frame, random_piece, (int(board_x + random_column*width_ratio), int(board_y + random_row*height_ratio)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) 
                 print(f'Place the {random_piece} {piece_height}x{piece_width} piece at {random_row + 1}, {random_column + 1} and press Enter to continue')
             else:
                 cv2.imshow("Frame", frame)
@@ -316,8 +317,8 @@ while vc.isOpened():
         board_x, board_y = get_main_board(imghsv, frame, kernel, lower_green, upper_green)
 
         # KEEP DRAWING THE RECTANGLE AND THE TEXT SO IT'S DRAWN EVERY FRAME -- MAYBE REMOVE THE WIDTH AND HEIGHT RATIO
-        cv2.rectangle(frame, (int(board_x + random_column), int(board_y + random_row)), (int(board_x + random_column + piece_width), int(board_y + random_row + piece_height)), (0, 255, 0), 2)
-        cv2.putText(frame, random_piece, (int(board_x + random_column), int(board_y + random_row)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) 
+        cv2.rectangle(frame, (int(board_x + random_column*width_ratio), int(board_y + random_row*height_ratio)), (int(board_x + random_column*width_ratio + piece_width*width_ratio), int(board_y + random_row*height_ratio + piece_height*height_ratio)), (0, 255, 0), 2)
+        cv2.putText(frame, random_piece, (int(board_x + random_column*width_ratio), int(board_y + random_row*height_ratio)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2) 
 
         cv2.imshow("Frame", frame)
         # MAKE IT GO TO THE NEXT PIECE
