@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import random as rand
-import numpy as np
 
 
 print("Starting program...")
